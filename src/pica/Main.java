@@ -22,7 +22,13 @@ import javax.swing.JLayeredPane;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import java.awt.ComponentOrientation;
-;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JToggleButton;
+import java.awt.FlowLayout;
+
 
 public class Main extends JFrame {
 
@@ -33,7 +39,6 @@ public class Main extends JFrame {
 	private JTextField adreseIevade;
 	private JTextField vardsDalejaIevade;
 	
-	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -42,12 +47,13 @@ public class Main extends JFrame {
 					FlatLaf.setGlobalExtraDefaults( Collections.singletonMap( "@accentColor", "#FFFFFF" ) );
 					UIManager.put( "Component.focusWidth", 0 );
 					FlatLightLaf.setup();
-			        UIManager.put("Button.arc", 35 );
+			        UIManager.put("Button.arc", 80 );
 			        UIManager.put("TextComponent.arc", 20);
 			        UIManager.put("CheckBox.arc", 4);
 			        
 			        
 					Main frame = new Main();
+					frame.setUndecorated(true); 
 					frame.setVisible(true);
 					
 				} catch (Exception e) {
@@ -261,6 +267,182 @@ public class Main extends JFrame {
 		registerBilde_1.setIcon(new ImageIcon(Main.class.getResource("/bildes/registracijaBilde.png")));
 		registerBilde_1.setBounds(205, 220, 585, 587);
 		registracijaDalejaEkrans.add(registerBilde_1);
+		
+		JPanel TitullapaEkrans = new JPanel();
+		TitullapaEkrans.setBackground(new Color(189, 195, 199));
+		contentPane.setLayer(TitullapaEkrans, 4);
+		TitullapaEkrans.setBounds(0, 0, 1000, 850);
+		contentPane.add(TitullapaEkrans);
+		TitullapaEkrans.setLayout(null);
+		
+		JButton menuButton = new JButton("");
+		menuButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				menuButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/hamburgers_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				menuButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/hamburgers.png")));
+			}
+		});
+		
+		JButton exitButton = new JButton("");
+		exitButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				
+			}
+		});
+		exitButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		exitButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				exitButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/exit_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				exitButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/exit.png")));
+			}
+		});
+		
+		JButton buvetPoga = new JButton("Turpināt");
+		buvetPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		buvetPoga.setBackground(new Color(205, 70, 49));
+		buvetPoga.setForeground(Color.WHITE);
+		buvetPoga.setFont(new Font("Inter", Font.PLAIN, 24));
+		buvetPoga.setBounds(348, 686, 303, 73);
+		TitullapaEkrans.add(buvetPoga);
+		exitButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/exit.png")));
+		exitButton.setFocusable(false);
+		exitButton.setFocusTraversalKeysEnabled(false);
+		exitButton.setFocusPainted(false);
+		exitButton.setContentAreaFilled(false);
+		exitButton.setBorder(null);
+		exitButton.setBackground(new Color(189, 195, 199));
+		exitButton.setBounds(920, 21, 55, 55);
+		TitullapaEkrans.add(exitButton);
+		menuButton.setContentAreaFilled(false);
+		menuButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		menuButton.setFocusable(false);
+		menuButton.setFocusTraversalKeysEnabled(false);
+		menuButton.setFocusPainted(false);
+		menuButton.setBorder(null);
+		menuButton.setBackground(new Color(189, 195, 199));
+		menuButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/hamburgers.png")));
+		menuButton.setBounds(21, 21, 55, 55);
+		TitullapaEkrans.add(menuButton);
+		
+		JPanel rekomendacijasPanel = new JPanel();
+		rekomendacijasPanel.setBackground(new Color(217, 217, 217));
+		rekomendacijasPanel.setBounds(0, 280, 1000, 335);
+		TitullapaEkrans.add(rekomendacijasPanel);
+		rekomendacijasPanel.setLayout(null);
+		
+		JButton labiPoga = new JButton("");
+		labiPoga.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				labiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/rightButton_hover.png")));
+			}
+			public void mouseExited(MouseEvent e) {
+				labiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/rightButton.png")));
+			}
+		});
+		labiPoga.setContentAreaFilled(false);
+		labiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		labiPoga.setBounds(950, 144, 40, 40);
+		labiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/rightButton.png")));
+		rekomendacijasPanel.add(labiPoga);
+		
+		JButton kreisiPoga = new JButton("");
+		kreisiPoga.setContentAreaFilled(false);
+		kreisiPoga.setBackground(new Color(217, 217, 217));
+		kreisiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		kreisiPoga.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				kreisiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/leftButton_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				kreisiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/leftButton.png")));
+			}
+		});
+		kreisiPoga.setBounds(10, 144, 40, 40);
+		kreisiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/leftButton.png")));
+		rekomendacijasPanel.add(kreisiPoga);
+		
+		JLabel bilde1 = new JLabel("");
+		bilde1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				bilde1.setIcon(new ImageIcon(Main.class.getResource("/bildes/margarita_hover.png")));
+				
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				bilde1.setIcon(new ImageIcon(Main.class.getResource("/bildes/margarita.png")));
+			}
+		});
+		bilde1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		bilde1.setBounds(71, 38, 271, 259);
+		bilde1.setIcon(new ImageIcon(Main.class.getResource("/bildes/margarita.png")));
+		rekomendacijasPanel.add(bilde1);
+		
+		JLabel bilde2 = new JLabel("");
+		bilde2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				bilde2.setIcon(new ImageIcon(Main.class.getResource("/bildes/lauku_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				bilde2.setIcon(new ImageIcon(Main.class.getResource("/bildes/lauku.png")));
+			}
+		});
+		bilde2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		bilde2.setBounds(363, 38, 271, 259);
+		bilde2.setIcon(new ImageIcon(Main.class.getResource("/bildes/lauku.png")));
+		rekomendacijasPanel.add(bilde2);
+		
+		JLabel bilde3 = new JLabel("");
+		bilde3.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				bilde3.setIcon(new ImageIcon(Main.class.getResource("/bildes/3sieru_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				bilde3.setIcon(new ImageIcon(Main.class.getResource("/bildes/3sieru.png")));
+			}
+		});
+		bilde3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		bilde3.setBounds(655, 38, 271, 259);
+		bilde3.setIcon(new ImageIcon(Main.class.getResource("/bildes/3sieru.png")));
+		rekomendacijasPanel.add(bilde3);
+		
+		JLabel titullapaBg = new JLabel("");
+		titullapaBg.setIcon(new ImageIcon(Main.class.getResource("/bildes/titullapaBg.png")));
+		titullapaBg.setBounds(-231, -375, 1388, 1290);
+		TitullapaEkrans.add(titullapaBg);
+		
+		JLabel titullapaLogo = new JLabel("");
+		titullapaLogo.setIcon(new ImageIcon(Main.class.getResource("/bildes/titullapaLogo.png")));
+		titullapaLogo.setBounds(374, 75, 251, 128);
+		TitullapaEkrans.add(titullapaLogo);
+		
+		JLabel tekstiLabel = new JLabel("");
+		tekstiLabel.setIcon(new ImageIcon(Main.class.getResource("/bildes/thinText.png")));
+		tekstiLabel.setBounds(51, 245, 556, 417);
+		TitullapaEkrans.add(tekstiLabel);
+		
+		JLabel lblNewLabel = new JLabel("Būve savu picu");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setFont(new Font("Inter", Font.BOLD, 14));
+		lblNewLabel.setBounds(398, 758, 204, 25);
+		TitullapaEkrans.add(lblNewLabel);
+		
 		
 		
 		/*Registrācijas ekrāns beigas
