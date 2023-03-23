@@ -26,11 +26,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JToggleButton;
-import java.awt.FlowLayout;
 
 
-public class Main extends JFrame {
+public class Main extends JFrame{
 
 	private JLayeredPane contentPane;
 	private JTextField vardsIevade;
@@ -38,6 +36,7 @@ public class Main extends JFrame {
 	private JTextField numursIevade;
 	private JTextField adreseIevade;
 	private JTextField vardsDalejaIevade;
+	private static JPanel sideBar;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -56,12 +55,16 @@ public class Main extends JFrame {
 					frame.setUndecorated(true); 
 					frame.setVisible(true);
 					
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
+	
+	
 
 	
 	//Vizualizācija
@@ -75,6 +78,7 @@ public class Main extends JFrame {
 		contentPane.setLayout(null);
 		
 		JPanel sakumaEkrans = new JPanel();
+		contentPane.setLayer(sakumaEkrans, 0);
 		sakumaEkrans.setBackground(new Color(189, 195, 199));
 		sakumaEkrans.setBounds(0, 0, 1000, 850);
 		contentPane.add(sakumaEkrans);
@@ -268,6 +272,10 @@ public class Main extends JFrame {
 		registerBilde_1.setBounds(205, 220, 585, 587);
 		registracijaDalejaEkrans.add(registerBilde_1);
 		
+		/*Registrācijas ekrāns beigas
+		 * ------------------------------------------------------
+		 Titullapas ekrāns sākums */
+		
 		JPanel TitullapaEkrans = new JPanel();
 		TitullapaEkrans.setBackground(new Color(189, 195, 199));
 		contentPane.setLayer(TitullapaEkrans, 4);
@@ -284,6 +292,10 @@ public class Main extends JFrame {
 			@Override
 			public void mouseExited(MouseEvent e) {
 				menuButton.setIcon(new ImageIcon(Main.class.getResource("/bildes/hamburgers.png")));
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				sideBar.setVisible(true);
 			}
 		});
 		
@@ -443,11 +455,93 @@ public class Main extends JFrame {
 		lblNewLabel.setBounds(398, 758, 204, 25);
 		TitullapaEkrans.add(lblNewLabel);
 		
-		
+		JLabel sideBarExit = new JLabel("");
+		sideBarExit.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				sideBar.setVisible(false);
+			}
+		});
+		sideBarExit.setBounds(340, 0, 224, 810);
+		TitullapaEkrans.add(sideBarExit);
 		
 		/*Registrācijas ekrāns beigas
 		 * ------------------------------------------------------
-		 Registrācijas ekrāns sākums */
+		 Sana malas sākums */
+		
+		sideBar = new JPanel();
+		sideBar.setBackground(Color.WHITE);
+		contentPane.setLayer(sideBar, 5);
+		sideBar.setBounds(0, 0, 339, 850);
+		contentPane.add(sideBar);
+		sideBar.setLayout(null);
+		
+		JLabel sveiksLabel = new JLabel("<html><body style='width: 200px'>Sveiks, Kaspars!");
+		sveiksLabel.setFont(new Font("Inter Medium", Font.BOLD, 40));
+		sveiksLabel.setBounds(16, 27, 304, 115);
+		sideBar.add(sveiksLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("");
+		lblNewLabel_1.setIcon(new ImageIcon(Main.class.getResource("/bildes/linijas.png")));
+		lblNewLabel_1.setBounds(16, 135, 255, 33);
+		sideBar.add(lblNewLabel_1);
+		
+		JButton titullapaPoga = new JButton(" Titullapa");
+		titullapaPoga.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sideBar.setVisible(false);
+			}
+		});
+		titullapaPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/titullapa_icon.png")));
+		titullapaPoga.setContentAreaFilled(false);
+		titullapaPoga.setBorder(null);
+		titullapaPoga.setBackground(Color.WHITE);
+		titullapaPoga.setHorizontalAlignment(SwingConstants.LEFT);
+		titullapaPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		titullapaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		titullapaPoga.setBounds(12, 220, 292, 33);
+		sideBar.add(titullapaPoga);
+		
+		JButton pasutijumiPoga = new JButton("   Pasūtījumi");
+		pasutijumiPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/pasutijumi_icon.png")));
+		pasutijumiPoga.setContentAreaFilled(false);
+		pasutijumiPoga.setBorder(null);
+		pasutijumiPoga.setBackground(Color.WHITE);
+		pasutijumiPoga.setHorizontalAlignment(SwingConstants.LEFT);
+		pasutijumiPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		pasutijumiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		pasutijumiPoga.setBounds(16, 264, 292, 33);
+		sideBar.add(pasutijumiPoga);
+		
+		JButton koduPoga = new JButton("   Izmantot atlaides kodu");
+		koduPoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/kodi_icon.png")));
+		koduPoga.setContentAreaFilled(false);
+		koduPoga.setBorder(null);
+		koduPoga.setBackground(Color.WHITE);
+		koduPoga.setHorizontalAlignment(SwingConstants.LEFT);
+		koduPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		koduPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		koduPoga.setBounds(16, 352, 292, 33);
+		sideBar.add(koduPoga);
+		
+		JButton vesturePoga = new JButton(" Vēsture");
+		vesturePoga.setIcon(new ImageIcon(Main.class.getResource("/bildes/history_icon.png")));
+		vesturePoga.setContentAreaFilled(false);
+		vesturePoga.setBorder(null);
+		vesturePoga.setBackground(Color.WHITE);
+		vesturePoga.setHorizontalAlignment(SwingConstants.LEFT);
+		vesturePoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		vesturePoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		vesturePoga.setBounds(16, 308, 292, 33);
+		sideBar.add(vesturePoga);
+		
+		JLabel sideBarImageLabel = new JLabel("");
+		sideBarImageLabel.setIcon(new ImageIcon(Main.class.getResource("/bildes/sideimage.png")));
+		sideBarImageLabel.setBounds(0, 470, 329, 408);
+		sideBar.add(sideBarImageLabel);
+		
+		
+	
 		
 		
 	}
