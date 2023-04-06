@@ -1,9 +1,12 @@
 package pica;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -13,26 +16,17 @@ import javax.swing.JLabel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
-
 import javax.swing.SwingConstants;
-import java.awt.Font;
-import java.awt.Rectangle;
 
 import javax.swing.JLayeredPane;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 
-import java.awt.ComponentOrientation;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Dimension;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
@@ -44,10 +38,10 @@ import javax.swing.JTable;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.Box;
-import java.awt.SystemColor;
 import javax.swing.JScrollPane;
 import javax.swing.JProgressBar;
-import java.awt.FlowLayout;
+
+import static pica.Run.defaultStateGatavamPogam;
 
 
 public class Vizualizacija extends JFrame{
@@ -63,7 +57,7 @@ public class Vizualizacija extends JFrame{
 	static double buvetCena = 8.79, 
 	lastCena = 8.79,
 	gatavaCena = 9.99, 
-	lastGatavaCena = 9.99, 
+	lastGatavaCena = 9.99, gatavaBaseCena,
 	pedejaVertiba;
 	static String temp = "", gatavaNosaukums = "";
 	//boolean 
@@ -72,11 +66,18 @@ public class Vizualizacija extends JFrame{
 	
 	static ArrayList<String> buvetSastavdalas = new ArrayList<>(), gatavaSastavdalas = new ArrayList<>();
 	static DefaultListModel<Pica> model = new DefaultListModel<>();
-	static String buvetApraksts = "",gatavaApraksts = ""; 
+	static String buvetApraksts = "",gatavaApraksts = "", adrese = ""; 
 	private static JSpinner spinner = new JSpinner();
 	
 	DecimalFormat df = new DecimalFormat("#.##");
-	private JTable table;
+	private JTable table; public static JComboBox adreseLauks;
+	public static JLabel slot1Procenti, slot2Procenti, slot3Procenti;
+	public static JLabel slot1Nosaukums, slot2Nosaukums, slot3Nosaukums;
+	public static JProgressBar slot1Progress, slot2Progress, slot3Progress;
+	public static JLabel slot1Apraksts, slot2Apraksts, slot3Apraksts;
+	public static JLabel slot1Bilde, slot2Bilde, slot3Bilde, gaidaSkaitsLabel, pasutijumuSkaitsLabel;
+	public static JToggleButton gatavacm20, gatavacm30, gatavacm60, gatavaplana, gatavavideja, gatavabieza;
+	public static JPanel slot1, slot2, slot3;
 
 	
 	//Vizualizācija
@@ -91,7 +92,9 @@ public class Vizualizacija extends JFrame{
 		contentPane.setLayout(null);
 		
 		JButton backPoga = new JButton("");
+		backPoga.setVisible(false);
 		contentPane.setLayer(backPoga, 12);
+		backPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		backPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/back.png")));
 		backPoga.setFocusable(false);
 		backPoga.setContentAreaFilled(false);
@@ -117,8 +120,8 @@ public class Vizualizacija extends JFrame{
 		
 		JPanel registracijaEkrans = new JPanel();
 		registracijaEkrans.setVisible(false);
-		registracijaEkrans.setBackground(new Color(189, 195, 199));
-		contentPane.setLayer(registracijaEkrans, 3);
+		registracijaEkrans.setBackground(new Color(255, 255, 255));
+		contentPane.setLayer(registracijaEkrans, 12);
 		registracijaEkrans.setBounds(0, -19, 1000, 850);
 		contentPane.add(registracijaEkrans);
 		registracijaEkrans.setLayout(null);
@@ -129,80 +132,82 @@ public class Vizualizacija extends JFrame{
 		registracijaEkrans.add(registracijaLogo);
 		
 		JLabel vardsIevadeLabel = new JLabel("Vārds");
-		vardsIevadeLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		vardsIevadeLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		vardsIevadeLabel.setBounds(318, 191, 54, 20);
 		registracijaEkrans.add(vardsIevadeLabel);
 		
 		vardsIevade = new JTextField();
-		vardsIevade.setFont(new Font("Inter", Font.PLAIN, 14));
+		vardsIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
 		vardsIevade.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		vardsIevade.setBounds(318, 214, 155, 30);
 		registracijaEkrans.add(vardsIevade);
 		vardsIevade.setColumns(10);
 		
 		uzvardsIevade = new JTextField();
-		uzvardsIevade.setFont(new Font("Inter", Font.PLAIN, 14));
+		uzvardsIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
 		uzvardsIevade.setColumns(10);
 		uzvardsIevade.setBounds(533, 214, 155, 30);
 		registracijaEkrans.add(uzvardsIevade);
 		
 		JLabel uzvardsLabel = new JLabel("Uzvārds");
-		uzvardsLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		uzvardsLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		uzvardsLabel.setBounds(533, 191, 81, 20);
 		registracijaEkrans.add(uzvardsLabel);
 		
 		numursIevade = new JTextField();
-		numursIevade.setFont(new Font("Inter", Font.PLAIN, 14));
+		numursIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
 		numursIevade.setText("+371 ");
 		numursIevade.setColumns(10);
 		numursIevade.setBounds(318, 284, 370, 30);
 		registracijaEkrans.add(numursIevade);
 		
 		JLabel numursIevadeLabel = new JLabel("Telefona numurs");
-		numursIevadeLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		numursIevadeLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		numursIevadeLabel.setBounds(318, 261, 155, 20);
 		registracijaEkrans.add(numursIevadeLabel);
 		
 		JLabel apmaksaLabel = new JLabel("Apmaksas veids");
-		apmaksaLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		apmaksaLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		apmaksaLabel.setBounds(318, 325, 155, 20);
 		registracijaEkrans.add(apmaksaLabel);
 		
 		JButton registerButton = new JButton("Turpināt");
 		registerButton.setForeground(Color.WHITE);
 		registerButton.setBackground(new Color(205, 70, 49));
-		registerButton.setFont(new Font("Inter", Font.PLAIN, 16));
+		registerButton.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		registerButton.setBounds(546, 422, 142, 42);
 		registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		registracijaEkrans.add(registerButton);
 		
 		JRadioButton choiceKarte = new JRadioButton("- Karte");
+		choiceKarte.setBackground(new Color(255, 255, 255));
 		choiceKarte.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
 		choiceKarte.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceKarte.setSelected(true);
-		choiceKarte.setFont(new Font("Inter", Font.PLAIN, 16));
+		choiceKarte.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		choiceKarte.setBounds(318, 352, 90, 30);
 		registracijaEkrans.add(choiceKarte);
 		choiceKarte.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 		JRadioButton choiceSkaidra = new JRadioButton("- Skaidrā naudā");
+		choiceSkaidra.setBackground(new Color(255, 255, 255));
 		choiceSkaidra.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceSkaidra.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
-		choiceSkaidra.setFont(new Font("Inter", Font.PLAIN, 16));
+		choiceSkaidra.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		choiceSkaidra.setBounds(417, 352, 197, 30);
 		registracijaEkrans.add(choiceSkaidra);
 		choiceSkaidra.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
 		JLabel registerBilde = new JLabel("");
 		registerBilde.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/registracijaBilde.png")));
-		registerBilde.setBounds(208, 261, 585, 587);
+		registerBilde.setBounds(207, 290, 585, 587);
 		registracijaEkrans.add(registerBilde);
 		
 		JPanel registracijaDalejaEkrans = new JPanel();
 		registracijaDalejaEkrans.setVisible(false);
-		contentPane.setLayer(registracijaDalejaEkrans, 0);
+		contentPane.setLayer(registracijaDalejaEkrans, 12);
 		registracijaDalejaEkrans.setLayout(null);
-		registracijaDalejaEkrans.setBackground(new Color(189, 195, 199));
+		registracijaDalejaEkrans.setBackground(new Color(255, 255, 255));
 		registracijaDalejaEkrans.setBounds(0, 0, 1000, 850);
 		contentPane.add(registracijaDalejaEkrans);
 		
@@ -213,26 +218,26 @@ public class Vizualizacija extends JFrame{
 		registracijaDalejaEkrans.add(registracijaLogo_1);
 		
 		JLabel vardsIevadeLabel_1 = new JLabel("Vārds");
-		vardsIevadeLabel_1.setFont(new Font("Inter", Font.PLAIN, 16));
+		vardsIevadeLabel_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		vardsIevadeLabel_1.setBounds(318, 191, 54, 20);
 		registracijaDalejaEkrans.add(vardsIevadeLabel_1);
 		
 		vardsDalejaIevade = new JTextField();
-		vardsDalejaIevade.setFont(new Font("Inter", Font.PLAIN, 14));
+		vardsDalejaIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
 		vardsDalejaIevade.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		vardsDalejaIevade.setColumns(10);
 		vardsDalejaIevade.setBounds(318, 214, 155, 30);
 		registracijaDalejaEkrans.add(vardsDalejaIevade);
 		
 		JLabel apmaksaLabel_1 = new JLabel("Apmaksas veids");
-		apmaksaLabel_1.setFont(new Font("Inter", Font.PLAIN, 16));
+		apmaksaLabel_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		apmaksaLabel_1.setBounds(318, 251, 155, 20);
 		registracijaDalejaEkrans.add(apmaksaLabel_1);
 		
 		JButton registerButton_1 = new JButton("Turpināt");
 		registerButton_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		registerButton_1.setForeground(Color.WHITE);
-		registerButton_1.setFont(new Font("Inter", Font.PLAIN, 16));
+		registerButton_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		registerButton_1.setBackground(new Color(205, 70, 49));
 		registerButton_1.setBounds(546, 357, 142, 42);
 		registracijaDalejaEkrans.add(registerButton_1);
@@ -242,7 +247,7 @@ public class Vizualizacija extends JFrame{
 		choiceKarte_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceKarte_1.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
 		choiceKarte_1.setSelected(true);
-		choiceKarte_1.setFont(new Font("Inter", Font.PLAIN, 16));
+		choiceKarte_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		choiceKarte_1.setBounds(318, 278, 90, 30);
 		registracijaDalejaEkrans.add(choiceKarte_1);
 		
@@ -250,7 +255,7 @@ public class Vizualizacija extends JFrame{
 		choiceSkaidra_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		choiceSkaidra_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceSkaidra_1.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
-		choiceSkaidra_1.setFont(new Font("Inter", Font.PLAIN, 16));
+		choiceSkaidra_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		choiceSkaidra_1.setBounds(417, 278, 197, 30);
 		registracijaDalejaEkrans.add(choiceSkaidra_1);
 		
@@ -267,7 +272,7 @@ public class Vizualizacija extends JFrame{
 		TitullapaEkrans.setBackground(new Color(240, 240, 240));
 		contentPane.setLayer(TitullapaEkrans, 4);
 		TitullapaEkrans.setBounds(0, 0, 1000, 850);
-		tabbedPane.addTab("Gatavās picas", new ImageIcon(Vizualizacija.class.getResource("/bildes/pasutijumi_icon.png")), TitullapaEkrans, null);
+		tabbedPane.addTab("Gatavās picas", null, TitullapaEkrans, "Izvēle ar jau gatavām picām, kuras var pasūtīt!");
 		//contentPane.add(TitullapaEkrans);
 		TitullapaEkrans.setLayout(null);
 		
@@ -362,7 +367,7 @@ public class Vizualizacija extends JFrame{
 		
 		JPanel buvetEkrans = new JPanel();
 		buvetEkrans.setBackground(new Color(240, 240, 240));
-		tabbedPane.addTab("Būvē savu picu", null, buvetEkrans, null);
+		tabbedPane.addTab("Būvē savu picu", null, buvetEkrans, "Ja neatradi gatavu pica kura tevi apmierina, vari buvēt savu picu!");
 		buvetEkrans.setLayout(null);
 		
 		tomatiBilde = new JLabel("");
@@ -481,7 +486,7 @@ public class Vizualizacija extends JFrame{
 		aprakstsLabel.setBounds(16, 18, 275, 128);
 		aprakstsLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		aprakstsLabel.setForeground(new Color(79, 79, 79));
-		aprakstsLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		aprakstsLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		panel_1.add(aprakstsLabel);
 		
 		JButton pirktPoga = new JButton("Pasūtīt");
@@ -490,7 +495,7 @@ public class Vizualizacija extends JFrame{
 		pirktPoga.setSize(new Dimension(173, 41));
 		pirktPoga.setForeground(Color.WHITE);
 		pirktPoga.setBackground(new Color(205, 70, 49));
-		pirktPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		pirktPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		panel_1.add(pirktPoga);
 		
 		spinner = new JSpinner();
@@ -499,154 +504,154 @@ public class Vizualizacija extends JFrame{
 		spinner.setFocusCycleRoot(true);
 		spinner.setFocusTraversalPolicyProvider(true);
 		spinner.setFocusable(false);
-		spinner.setFont(new Font("Inter", Font.BOLD, 14));
+		spinner.setFont(new Font("Segoe UI",  Font.BOLD, 14));
 		spinner.setBounds(58, 160, 55, 34);
 		panel_1.add(spinner);
 		
 		JToggleButton cm20 = new JToggleButton("20cm");
 		cm20.setSelected(true);
 		cm20.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		cm20.setFont(new Font("Inter", Font.PLAIN, 16));
+		cm20.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		cm20.setBounds(425, 187, 115, 34);
 		cm20.putClientProperty( "JToggleButton.buttonType", "roundRect" );
 		buvetEkrans.add(cm20);
 		
 		JToggleButton cm30 = new JToggleButton("30cm");
 		cm30.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		cm30.setFont(new Font("Inter", Font.PLAIN, 16));
+		cm30.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		cm30.setBounds(560, 187, 115, 34);
 		buvetEkrans.add(cm30);
 		
 		JToggleButton cm60 = new JToggleButton("60cm");
 		cm60.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		cm60.setFont(new Font("Inter", Font.PLAIN, 16));
+		cm60.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		cm60.setBounds(695, 187, 115, 34);
 		buvetEkrans.add(cm60);
 		
 		JToggleButton planaPoga = new JToggleButton("Plāna");
 		planaPoga.setSelected(true);
 		planaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		planaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		planaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		planaPoga.setBounds(425, 282, 115, 34);
 		buvetEkrans.add(planaPoga);
 		
 		JToggleButton videjaPoga = new JToggleButton("Vidēja");
 		videjaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		videjaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		videjaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		videjaPoga.setBounds(560, 282, 115, 34);
 		buvetEkrans.add(videjaPoga);
 		
 		JToggleButton biezaPoga = new JToggleButton("Bieza");
 		biezaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		biezaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		biezaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		biezaPoga.setBounds(695, 282, 115, 34);
 		buvetEkrans.add(biezaPoga);
 		
 		JToggleButton tomatuPoga = new JToggleButton("Tomātu");
 		tomatuPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		tomatuPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		tomatuPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		tomatuPoga.setBounds(425, 365, 115, 34);
 		buvetEkrans.add(tomatuPoga);
 		
 		JToggleButton bbqsPoga = new JToggleButton("BBQ");
 		bbqsPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		bbqsPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		bbqsPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		bbqsPoga.setBounds(560, 365, 115, 34);
 		buvetEkrans.add(bbqsPoga);
 		
 		JToggleButton bezmercePoga = new JToggleButton("Bez");
 		bezmercePoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		bezmercePoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		bezmercePoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		bezmercePoga.setBounds(695, 365, 115, 34);
 		buvetEkrans.add(bezmercePoga);
 		
 		JToggleButton parastsPoga = new JToggleButton("Parastais");
 		parastsPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		parastsPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		parastsPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		parastsPoga.setBounds(425, 456, 115, 34);
 		buvetEkrans.add(parastsPoga);
 		
 		JToggleButton zilaisPoga = new JToggleButton("Zilais");
 		zilaisPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		zilaisPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		zilaisPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		zilaisPoga.setBounds(560, 456, 115, 34);
 		buvetEkrans.add(zilaisPoga);
 		
 		JToggleButton mocarellaPoga = new JToggleButton("Mocarella");
 		mocarellaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		mocarellaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		mocarellaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		mocarellaPoga.setBounds(695, 456, 115, 34);
 		buvetEkrans.add(mocarellaPoga);
 		
 		JToggleButton bezsiersPoga = new JToggleButton("Bez");
 		bezsiersPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		bezsiersPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		bezsiersPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		bezsiersPoga.setBounds(835, 456, 115, 34);
 		buvetEkrans.add(bezsiersPoga);
 		
 		JToggleButton bezgalaPoga = new JToggleButton("Bez");
 		bezgalaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		bezgalaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		bezgalaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		bezgalaPoga.setBounds(835, 544, 115, 34);
 		buvetEkrans.add(bezgalaPoga);
 		
 		JToggleButton vistaPoga = new JToggleButton("Vista");
 		vistaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		vistaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		vistaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		vistaPoga.setBounds(695, 544, 115, 34);
 		buvetEkrans.add(vistaPoga);
 		
 		JToggleButton skinkisPoga = new JToggleButton("Šķinķis");
 		skinkisPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		skinkisPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		skinkisPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		skinkisPoga.setBounds(560, 544, 115, 34);
 		buvetEkrans.add(skinkisPoga);
 		
 		JToggleButton salamisPoga = new JToggleButton("Salami");
 		salamisPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		salamisPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		salamisPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		salamisPoga.setBounds(425, 544, 115, 34);
 		buvetEkrans.add(salamisPoga);
 		
 		JToggleButton tomatiPoga = new JToggleButton("Tomāti");
 		tomatiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		tomatiPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		tomatiPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		tomatiPoga.setBounds(835, 633, 115, 34);
 		buvetEkrans.add(tomatiPoga);
 		
 		JToggleButton ananasiPoga = new JToggleButton("Ananāsi");
 		ananasiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		ananasiPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		ananasiPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		ananasiPoga.setBounds(695, 633, 115, 34);
 		buvetEkrans.add(ananasiPoga);
 		
 		JToggleButton gurkiPoga = new JToggleButton("Gurķi");
 		gurkiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		gurkiPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		gurkiPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gurkiPoga.setBounds(560, 633, 115, 34);
 		buvetEkrans.add(gurkiPoga);
 		
 		JToggleButton senesPoga = new JToggleButton("Sēnes");
 		senesPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		senesPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		senesPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		senesPoga.setBounds(425, 633, 115, 34);
 		buvetEkrans.add(senesPoga);
 		
 		JToggleButton sipoliPoga = new JToggleButton("Sīpoli");
 		sipoliPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		sipoliPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		sipoliPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		sipoliPoga.setBounds(560, 678, 115, 34);
 		buvetEkrans.add(sipoliPoga);
 		
 		JToggleButton jalapenoPoga = new JToggleButton("Jalapeno");
 		jalapenoPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		jalapenoPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		jalapenoPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		jalapenoPoga.setBounds(425, 678, 115, 34);
 		buvetEkrans.add(jalapenoPoga);
 		
 		JToggleButton bezpiedevasPoga = new JToggleButton("Bez");
 		bezpiedevasPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		bezpiedevasPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		bezpiedevasPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		bezpiedevasPoga.setBounds(695, 678, 115, 34);
 		buvetEkrans.add(bezpiedevasPoga);
 		
@@ -666,111 +671,162 @@ public class Vizualizacija extends JFrame{
 		buvetEkrans.add(bgBilde);
 		
 		JPanel pasutijumiEkrans = new JPanel();
-		tabbedPane.addTab("Pasūtījumi", null, pasutijumiEkrans, "Apskati pašreizejos pasūtījumus un pasūtījumu vēsturi");
+		tabbedPane.addTab("Pasūtījumi", null, pasutijumiEkrans, "Šeit vari apskatīt kā gatavojas pašreizējie pasūtījumi un pasūtījumu vēsturi!");
 		pasutijumiEkrans.setLayout(null);
 		
-		JPanel panel_5 = new JPanel();
-		panel_5.setBounds(45, 271, 260, 321);
-		pasutijumiEkrans.add(panel_5);
-		panel_5.setLayout(null);
+		JLabel pasutijumiLabel = new JLabel("");
+		pasutijumiLabel.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/pasutijumi logo.png")));
+		pasutijumiLabel.setBounds(349, 11, 297, 147);
+		pasutijumiEkrans.add(pasutijumiLabel);
 		
-		JLabel lblNewLabel_6 = new JLabel("");
-		lblNewLabel_6.setBounds(45, 5, 170, 172);
-		lblNewLabel_6.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/blurpizza.png")));
-		panel_5.add(lblNewLabel_6);
+		JPanel picuProgressPanel = new JPanel();
+		picuProgressPanel.setVisible(false);
+		picuProgressPanel.setBounds(30, 129, 928, 587);
+		pasutijumiEkrans.add(picuProgressPanel);
+		picuProgressPanel.setLayout(null);
 		
-		JLabel lblNewLabel_7 = new JLabel("Salami pica");
-		lblNewLabel_7.setBounds(104, 182, 52, 14);
-		lblNewLabel_7.setHorizontalAlignment(SwingConstants.CENTER);
-		panel_5.add(lblNewLabel_7);
+		slot1 = new JPanel();
+		slot1.setBounds(32, 117, 249, 321);
+		picuProgressPanel.add(slot1);
+		slot1.setVisible(false);
+		slot1.setLayout(null);
 		
-		JProgressBar progressBar = new JProgressBar();
-		progressBar.setBounds(57, 201, 146, 27);
-		panel_5.add(progressBar);
+		slot1Procenti = new JLabel("15%");
+		slot1Procenti.setForeground(new Color(240, 240, 240));
+		slot1Procenti.setFont(new Font("Segoe UI",  Font.BOLD, 24));
+		slot1Procenti.setHorizontalAlignment(SwingConstants.CENTER);
+		slot1Procenti.setBounds(0, 5, 249, 172);
+		slot1.add(slot1Procenti);
 		
-		JLabel lblNewLabel_8 = new JLabel("<html><body style='width: 140px'>25 cm, Vidēja mīkla, Tomātu mērce, Bez siera, Vistas gaļa, Jalapeno un Sīpoli");
-		lblNewLabel_8.setBounds(42, 243, 182, 42);
-		lblNewLabel_8.setHorizontalAlignment(SwingConstants.CENTER);
-		panel_5.add(lblNewLabel_8);
+		slot1Bilde = new JLabel("");
+		slot1Bilde.setBounds(39, 5, 170, 172);
+		slot1Bilde.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/blurpizza.png")));
+		slot1.add(slot1Bilde);
+		
+		slot1Nosaukums = new JLabel("Salami pica");
+		slot1Nosaukums.setFont(new Font("Segoe UI",  Font.BOLD, 16));
+		slot1Nosaukums.setBounds(0, 171, 249, 38);
+		slot1Nosaukums.setHorizontalAlignment(SwingConstants.CENTER);
+		slot1.add(slot1Nosaukums);
+		
+		slot1Progress = new JProgressBar();
+		slot1Progress.setValue(68);
+		slot1Progress.setBounds(34, 210, 180, 8);
+		slot1.add(slot1Progress);
+		
+		slot1Apraksts = new JLabel("<html><body style='width: 140px'>25 cm, Vidēja mīkla, Tomātu mērce, Bez siera, Vistas gaļa, Jalapeno un Sīpoli");
+		slot1Apraksts.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
+		slot1Apraksts.setVerticalAlignment(SwingConstants.TOP);
+		slot1Apraksts.setBounds(39, 224, 182, 92);
+		slot1Apraksts.setHorizontalAlignment(SwingConstants.CENTER);
+		slot1.add(slot1Apraksts);
+		
+		slot2 = new JPanel();
+		slot2.setBounds(343, 117, 249, 321);
+		picuProgressPanel.add(slot2);
+		slot2.setVisible(false);
+		slot2.setLayout(null);
+		
+		slot2Procenti = new JLabel("15%");
+		slot2Procenti.setHorizontalAlignment(SwingConstants.CENTER);
+		slot2Procenti.setForeground(new Color(240, 240, 240));
+		slot2Procenti.setFont(new Font("Segoe UI",  Font.BOLD, 24));
+		slot2Procenti.setBounds(0, 5, 249, 172);
+		slot2.add(slot2Procenti);
+		
+		slot2Bilde = new JLabel("");
+		slot2Bilde.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/blurpizza.png")));
+		slot2Bilde.setBounds(39, 5, 170, 172);
+		slot2.add(slot2Bilde);
+		
+		slot2Nosaukums = new JLabel("Salami pica");
+		slot2Nosaukums.setFont(new Font("Segoe UI",  Font.BOLD, 16));
+		slot2Nosaukums.setHorizontalAlignment(SwingConstants.CENTER);
+		slot2Nosaukums.setBounds(0, 171, 249, 38);
+		slot2.add(slot2Nosaukums);
+		
+		slot2Progress = new JProgressBar();
+		slot2Progress.setBounds(34, 210, 180, 8);
+		slot2.add(slot2Progress);
+		
+		slot2Apraksts = new JLabel("<html><body style='width: 140px'>25 cm, Vidēja mīkla, Tomātu mērce, Bez siera, Vistas gaļa, Jalapeno un Sīpoli");
+		slot2Apraksts.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
+		slot2Apraksts.setVerticalAlignment(SwingConstants.TOP);
+		slot2Apraksts.setHorizontalAlignment(SwingConstants.CENTER);
+		slot2Apraksts.setBounds(33, 220, 182, 95);
+		slot2.add(slot2Apraksts);
+		
+		slot3 = new JPanel();
+		slot3.setBounds(654, 117, 249, 321);
+		picuProgressPanel.add(slot3);
+		slot3.setVisible(false);
+		slot3.setLayout(null);
+		
+		slot3Procenti = new JLabel("15%");
+		slot3Procenti.setHorizontalAlignment(SwingConstants.CENTER);
+		slot3Procenti.setForeground(new Color(240, 240, 240));
+		slot3Procenti.setFont(new Font("Segoe UI",  Font.BOLD, 24));
+		slot3Procenti.setBounds(0, 5, 249, 172);
+		slot3.add(slot3Procenti);
+		
+		slot3Bilde = new JLabel("");
+		slot3Bilde.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/blurpizza.png")));
+		slot3Bilde.setBounds(39, 5, 170, 172);
+		slot3.add(slot3Bilde);
+		
+		slot3Nosaukums = new JLabel("Salami pica");
+		slot3Nosaukums.setFont(new Font("Segoe UI",  Font.BOLD, 16));
+		slot3Nosaukums.setHorizontalAlignment(SwingConstants.CENTER);
+		slot3Nosaukums.setBounds(0, 171, 249, 38);
+		slot3.add(slot3Nosaukums);
+		
+		slot3Progress = new JProgressBar();
+		slot3Progress.setBounds(34, 210, 180, 8);
+		slot3.add(slot3Progress);
+		
+		slot3Apraksts = new JLabel("<html><body style='width: 140px'>25 cm, Vidēja mīkla, Tomātu mērce, Bez siera, Vistas gaļa, Jalapeno un Sīpoli");
+		slot3Apraksts.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
+		slot3Apraksts.setVerticalAlignment(SwingConstants.TOP);
+		slot3Apraksts.setHorizontalAlignment(SwingConstants.CENTER);
+		slot3Apraksts.setBounds(33, 223, 182, 90);
+		slot3.add(slot3Apraksts);
+		
+		pasutijumuSkaitsLabel = new JLabel("3/3");
+		pasutijumuSkaitsLabel.setVerticalAlignment(SwingConstants.TOP);
+		pasutijumuSkaitsLabel.setBounds(358, 11, 218, 55);
+		picuProgressPanel.add(pasutijumuSkaitsLabel);
+		pasutijumuSkaitsLabel.setForeground(Color.DARK_GRAY);
+		pasutijumuSkaitsLabel.setFont(new Font("Segoe UI",  Font.BOLD, 34));
+		pasutijumuSkaitsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		JLabel pasutijumuVestureLabel = new JLabel("");
+		pasutijumuVestureLabel.setBounds(359, 477, 216, 43);
+		picuProgressPanel.add(pasutijumuVestureLabel);
+		pasutijumuVestureLabel.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/Pasūtījumu vēsture.png")));
+		
+		JButton vestureButton = new JButton("Apskatīt");
+		vestureButton.setBounds(390, 531, 155, 36);
+		picuProgressPanel.add(vestureButton);
+		vestureButton.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
+		
+		gaidaSkaitsLabel = new JLabel("1 gaida");
+		gaidaSkaitsLabel.setBounds(358, 63, 218, 43);
+		picuProgressPanel.add(gaidaSkaitsLabel);
+		gaidaSkaitsLabel.setVerticalAlignment(SwingConstants.TOP);
+		gaidaSkaitsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		gaidaSkaitsLabel.setForeground(Color.DARK_GRAY);
+		gaidaSkaitsLabel.setFont(new Font("Segoe UI",  Font.BOLD, 16));
+		
+		JLabel lblNewLabel_6 = new JLabel("Veic pasūtījumu, lai redzētu progresu!");
+		lblNewLabel_6.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_6.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
+		lblNewLabel_6.setBounds(314, 394, 366, 75);
+		pasutijumiEkrans.add(lblNewLabel_6);
 		
 		JPanel grozsEkrans = new JPanel();
-		tabbedPane.addTab("Grozs", null, grozsEkrans, null);
+		grozsEkrans.setBackground(new Color(240, 240, 240));
+		tabbedPane.addTab("Grozs", null, grozsEkrans, "Tavs groziņš, šeit vari norādīt kur ēdīsi un apmaksāt pirkumu!");
 		grozsEkrans.setLayout(null);
-		
-		JPanel uzvietasPanel = new JPanel();
-		uzvietasPanel.setVisible(false);
-		uzvietasPanel.setLayout(null);
-		uzvietasPanel.setBackground(SystemColor.menu);
-		uzvietasPanel.setBounds(531, 150, 421, 557);
-		grozsEkrans.add(uzvietasPanel);
-		
-		JPanel panel_2_1 = new JPanel();
-		panel_2_1.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
-		panel_2_1.setLayout(null);
-		panel_2_1.setBackground(Color.WHITE);
-		panel_2_1.setBounds(0, 0, 420, 303);
-		uzvietasPanel.add(panel_2_1);
-		
-		JLabel lblNewLabel_2_1 = new JLabel("");
-		lblNewLabel_2_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/uzvietasmap.png")));
-		lblNewLabel_2_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2_1.setAlignmentY(1.0f);
-		lblNewLabel_2_1.setAlignmentX(1.0f);
-		lblNewLabel_2_1.setBounds(0, 0, 420, 263);
-		panel_2_1.add(lblNewLabel_2_1);
-		
-		JLabel lblNewLabel_3_1 = new JLabel("<html><b>Liepājas Valsts tehnikums</b><br>Ventspils iela 51");
-		lblNewLabel_3_1.setFont(new Font("Inter", Font.PLAIN, 12));
-		lblNewLabel_3_1.setAlignmentY(0.0f);
-		lblNewLabel_3_1.setAlignmentX(0.5f);
-		lblNewLabel_3_1.setBounds(20, 237, 170, 44);
-		panel_2_1.add(lblNewLabel_3_1);
-		
-		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
-		horizontalStrut_2.setBounds(0, 0, 0, 0);
-		panel_2_1.add(horizontalStrut_2);
-		
-		Component verticalStrut_1 = Box.createVerticalStrut(20);
-		verticalStrut_1.setBounds(0, 0, 0, 0);
-		panel_2_1.add(verticalStrut_1);
-		
-		Component horizontalStrut_1_1 = Box.createHorizontalStrut(20);
-		horizontalStrut_1_1.setBounds(0, 0, 0, 0);
-		panel_2_1.add(horizontalStrut_1_1);
-		
-		JPanel panel_4_1 = new JPanel();
-		panel_4_1.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
-		panel_4_1.setLayout(null);
-		panel_4_1.setBackground(Color.WHITE);
-		panel_4_1.setBounds(0, 311, 420, 163);
-		uzvietasPanel.add(panel_4_1);
-		
-		JLabel piegadeKopaLabel_1 = new JLabel("0.0€");
-		piegadeKopaLabel_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		piegadeKopaLabel_1.setFont(new Font("Inter", Font.BOLD, 12));
-		piegadeKopaLabel_1.setBounds(353, 43, 46, 14);
-		panel_4_1.add(piegadeKopaLabel_1);
-		
-		JLabel piegadePiegadeLabel_2 = new JLabel("0.0€");
-		piegadePiegadeLabel_2.setHorizontalAlignment(SwingConstants.RIGHT);
-		piegadePiegadeLabel_2.setFont(new Font("Inter", Font.BOLD, 12));
-		piegadePiegadeLabel_2.setBounds(353, 20, 46, 14);
-		panel_4_1.add(piegadePiegadeLabel_2);
-		
-		JLabel lblNewLabel_5_1 = new JLabel("");
-		lblNewLabel_5_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkout.png")));
-		lblNewLabel_5_1.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNewLabel_5_1.setBounds(21, -6, 378, 90);
-		panel_4_1.add(lblNewLabel_5_1);
-		
-		JButton uzVietasPasutitPoga = new JButton("Pasūtīt");
-		uzVietasPasutitPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		uzVietasPasutitPoga.putClientProperty( FlatClientProperties.STYLE, "arc: 50" );
-		uzVietasPasutitPoga.setForeground(Color.WHITE);
-		uzVietasPasutitPoga.setFont(new Font("Inter", Font.BOLD, 14));
-		uzVietasPasutitPoga.setBackground(new Color(205, 70, 49));
-		uzVietasPasutitPoga.setBounds(116, 99, 183, 47);
-		panel_4_1.add(uzVietasPasutitPoga);
 		
 		JPanel piegadePanel = new JPanel();
 		piegadePanel.setBackground(new Color(240, 240, 240));
@@ -778,11 +834,11 @@ public class Vizualizacija extends JFrame{
 		grozsEkrans.add(piegadePanel);
 		piegadePanel.setLayout(null);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
-		panel_2.setBounds(0, 0, 420, 303);
-		panel_2.setBackground(Color.WHITE);
-		piegadePanel.add(panel_2);
+		JPanel kartePanel = new JPanel();
+		kartePanel.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
+		kartePanel.setBounds(0, 0, 420, 303);
+		kartePanel.setBackground(Color.WHITE);
+		piegadePanel.add(kartePanel);
 		
 		JLabel lblNewLabel_2 = new JLabel("");
 		lblNewLabel_2.setLocation(0, 0);
@@ -793,87 +849,83 @@ public class Vizualizacija extends JFrame{
 		lblNewLabel_2.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/uzvietasmap.png")));
 		
 		JLabel lblNewLabel_3 = new JLabel("<html><b>Liepājas Valsts tehnikums</b><br>Ventspils iela 51");
-		lblNewLabel_3.setFont(new Font("Inter", Font.PLAIN, 12));
+		lblNewLabel_3.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
 		lblNewLabel_3.setBounds(20, 237, 170, 44);
 		lblNewLabel_3.setAlignmentX(Component.CENTER_ALIGNMENT);
 		lblNewLabel_3.setAlignmentY(Component.TOP_ALIGNMENT);
-		panel_2.setLayout(null);
-		panel_2.add(lblNewLabel_2);
-		panel_2.add(lblNewLabel_3);
+		kartePanel.setLayout(null);
+		kartePanel.add(lblNewLabel_2);
+		kartePanel.add(lblNewLabel_3);
 		
 		Component horizontalStrut = Box.createHorizontalStrut(20);
-		panel_2.add(horizontalStrut);
+		kartePanel.add(horizontalStrut);
 		
 		Component verticalStrut = Box.createVerticalStrut(20);
-		panel_2.add(verticalStrut);
+		kartePanel.add(verticalStrut);
 		
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
-		panel_2.add(horizontalStrut_1);
+		kartePanel.add(horizontalStrut_1);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
-		panel_3.setBackground(Color.WHITE);
-		panel_3.setBounds(0, 309, 420, 49);
-		piegadePanel.add(panel_3);
-		panel_3.setLayout(null);
+		JPanel adresePanel = new JPanel();
+		adresePanel.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
+		adresePanel.setBackground(Color.WHITE);
+		adresePanel.setBounds(0, 309, 420, 49);
+		piegadePanel.add(adresePanel);
+		adresePanel.setLayout(null);
 		
-		JButton btnNewButton = new JButton("Norādi adresi");
-		btnNewButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnNewButton.setBorderPainted(false);
-		btnNewButton.setFocusable(false);
-		btnNewButton.setFont(new Font("Inter", Font.PLAIN, 12));
-		btnNewButton.setHorizontalAlignment(SwingConstants.LEFT);
-		btnNewButton.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/marker2.png")));
-		btnNewButton.setBounds(10, 5, 354, 38);
-		panel_3.add(btnNewButton);
 		
-		JButton btnNewButton_1 = new JButton("");
-		btnNewButton_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnNewButton_1.setFocusable(false);
-		btnNewButton_1.setBorderPainted(false);
-		btnNewButton_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/x2.png")));
-		btnNewButton_1.setBounds(374, 14, 36, 23);
-		panel_3.add(btnNewButton_1);
+		adreseLauks = new JComboBox();
+		adreseLauks.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
+		adreseLauks.setToolTipText("Norādiet savu adresi šeit!");
+		adreseLauks.setEditable(true);
+		//adreseLauks.setText("Ievadi adresi");
+		adreseLauks.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		adreseLauks.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		//adreseLauks.setHorizontalAlignment(SwingConstants.LEFT);
+		//adreseLauks.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/marker2.png")));
+		adreseLauks.setBounds(10, 8, 400, 32);
+		adresePanel.add(adreseLauks);
 		
-		JPanel panel_4 = new JPanel();
-		panel_4.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
-		panel_4.setBackground(Color.WHITE);
-		panel_4.setBounds(0, 365, 420, 195);
-		piegadePanel.add(panel_4);
-		panel_4.setLayout(null);
+		JPanel summaPanel = new JPanel();
+		summaPanel.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
+		summaPanel.setBackground(Color.WHITE);
+		summaPanel.setBounds(0, 365, 420, 195);
+		piegadePanel.add(summaPanel);
+		summaPanel.setLayout(null);
 		
-		JLabel piegadeKopaLabel = new JLabel("0.00€");
-		piegadeKopaLabel.setFont(new Font("Inter", Font.BOLD, 12));
-		piegadeKopaLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		piegadeKopaLabel.setBounds(353, 94, 46, 14);
-		panel_4.add(piegadeKopaLabel);
+		JLabel kopaLbl = new JLabel("0.00€");
+		kopaLbl.setFont(new Font("Segoe UI",  Font.BOLD, 12));
+		kopaLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		kopaLbl.setBounds(353, 94, 46, 14);
+		summaPanel.add(kopaLbl);
 		
-		JLabel piegadePiegadeLabel = new JLabel("0.00€");
-		piegadePiegadeLabel.setFont(new Font("Inter", Font.BOLD, 12));
-		piegadePiegadeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		piegadePiegadeLabel.setBounds(353, 61, 46, 14);
-		panel_4.add(piegadePiegadeLabel);
+		JLabel piegadeLbl = new JLabel("0.00€");
+		piegadeLbl.setFont(new Font("Segoe UI",  Font.BOLD, 12));
+		piegadeLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		piegadeLbl.setBounds(353, 61, 46, 14);
+		summaPanel.add(piegadeLbl);
 		
-		JLabel piegadeSummaLabel = new JLabel("0.00€");
-		piegadeSummaLabel.setFont(new Font("Inter", Font.BOLD, 12));
-		piegadeSummaLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		piegadeSummaLabel.setBounds(352, 29, 46, 14);
-		panel_4.add(piegadeSummaLabel);
+		JLabel summaLbl = new JLabel("0.00€");
+		summaLbl.setFont(new Font("Segoe UI",  Font.BOLD, 12));
+		summaLbl.setHorizontalAlignment(SwingConstants.RIGHT);
+		summaLbl.setBounds(352, 29, 46, 14);
+		summaPanel.add(summaLbl);
 		
 		JLabel lblNewLabel_5 = new JLabel("");
 		lblNewLabel_5.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel_5.setBounds(21, 21, 378, 90);
 		lblNewLabel_5.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkout2.png")));
-		panel_4.add(lblNewLabel_5);
+		summaPanel.add(lblNewLabel_5);
 		
 		JButton piegadePasutitPoga = new JButton("Pasūtīt");
 		piegadePasutitPoga.putClientProperty( FlatClientProperties.STYLE, "arc: 50" );
 		piegadePasutitPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		piegadePasutitPoga.setForeground(Color.WHITE);
-		piegadePasutitPoga.setFont(new Font("Inter", Font.BOLD, 14));
+		piegadePasutitPoga.setFont(new Font("Segoe UI",  Font.BOLD, 14));
 		piegadePasutitPoga.setBackground(new Color(205, 70, 49));
-		piegadePasutitPoga.setBounds(116, 137, 183, 47);
-		panel_4.add(piegadePasutitPoga);
+		piegadePasutitPoga.setBounds(116, 124, 183, 47);
+		summaPanel.add(piegadePasutitPoga);
+		
 		
 		JToggleButton piegadePoga = new JToggleButton("Piegāde");
 		piegadePoga.putClientProperty( FlatClientProperties.STYLE, "arc: 50" );
@@ -919,7 +971,7 @@ public class Vizualizacija extends JFrame{
 		    public Component getListCellRendererComponent(JList<? extends Pica> list, Pica value, int index, boolean isSelected, boolean cellHasFocus) {
 		        JPanel panel = new JPanel(new BorderLayout());
 		        JLabel apraksts = new JLabel(value.getApraksts());
-		        JLabel imageLabel = new JLabel(value.getBilde());
+		        JLabel imageLabel = new JLabel(new ImageIcon(value.getBilde().getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
 		        JButton nonemtPoga = new JButton("x");
 		        nonemtPoga.setFont(new Font("Inter Medium", Font.PLAIN, 14));
 		        nonemtPoga.setBorderPainted(false);
@@ -950,9 +1002,19 @@ public class Vizualizacija extends JFrame{
 				for(int i = 0; i< Run.PasutijumuSaraksts.size(); i++)
 					summaCena += Run.PasutijumuSaraksts.get(i).getCena();
 				
-				piegadeSummaLabel.setText(df.format(summaCena)+"€");
-				piegadePiegadeLabel.setText(df.format(summaCena/10)+"€");
-				piegadeKopaLabel.setText(df.format(summaCena + (summaCena/10))+"€");
+				summaLbl.setText(df.format(summaCena)+"€");
+				if(piegadePoga.isSelected())
+				{
+					piegadeLbl.setText(df.format(summaCena/10)+"€");
+					kopaLbl.setText(df.format(summaCena + (summaCena/10))+"€");
+				}
+				else
+				{
+					piegadeLbl.setText("0.00€");
+					kopaLbl.setText(df.format(summaCena)+"€");
+				}
+					
+	
                 
             }
         });
@@ -991,7 +1053,7 @@ public class Vizualizacija extends JFrame{
 		titullapaPoga.setBorder(null);
 		titullapaPoga.setBackground(Color.WHITE);
 		titullapaPoga.setHorizontalAlignment(SwingConstants.LEFT);
-		titullapaPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		titullapaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
 		titullapaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		titullapaPoga.setBounds(12, 220, 292, 33);
 		sideBar.add(titullapaPoga);
@@ -1002,7 +1064,7 @@ public class Vizualizacija extends JFrame{
 		pasutijumiPoga.setBorder(null);
 		pasutijumiPoga.setBackground(Color.WHITE);
 		pasutijumiPoga.setHorizontalAlignment(SwingConstants.LEFT);
-		pasutijumiPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		pasutijumiPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
 		pasutijumiPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pasutijumiPoga.setBounds(16, 264, 292, 33);
 		sideBar.add(pasutijumiPoga);
@@ -1013,7 +1075,7 @@ public class Vizualizacija extends JFrame{
 		koduPoga.setBorder(null);
 		koduPoga.setBackground(Color.WHITE);
 		koduPoga.setHorizontalAlignment(SwingConstants.LEFT);
-		koduPoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		koduPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
 		koduPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		koduPoga.setBounds(16, 352, 292, 33);
 		sideBar.add(koduPoga);
@@ -1024,7 +1086,7 @@ public class Vizualizacija extends JFrame{
 		vesturePoga.setBorder(null);
 		vesturePoga.setBackground(Color.WHITE);
 		vesturePoga.setHorizontalAlignment(SwingConstants.LEFT);
-		vesturePoga.setFont(new Font("Inter", Font.PLAIN, 12));
+		vesturePoga.setFont(new Font("Segoe UI",  Font.PLAIN, 12));
 		vesturePoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		vesturePoga.setBounds(16, 308, 292, 33);
 		sideBar.add(vesturePoga);
@@ -1035,6 +1097,7 @@ public class Vizualizacija extends JFrame{
 		sideBar.add(sideBarImageLabel);
 		
 		JButton exitPoga = new JButton("");
+		exitPoga.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 		exitPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
@@ -1042,16 +1105,7 @@ public class Vizualizacija extends JFrame{
 			}
 		});
 		exitPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		exitPoga.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				exitPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/exit_hover.png")));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				exitPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/exit.png")));
-			}
-		});
+
 		exitPoga.setContentAreaFilled(false);
 		exitPoga.setBorderPainted(false);
 		exitPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -1063,7 +1117,7 @@ public class Vizualizacija extends JFrame{
 		
 		JPanel sakumaEkrans = new JPanel();
 		contentPane.setLayer(sakumaEkrans, 2);
-		sakumaEkrans.setBackground(new Color(189, 195, 199));
+		sakumaEkrans.setBackground(new Color(240, 240, 240));
 		sakumaEkrans.setBounds(0, 0, 1000, 850);
 		contentPane.add(sakumaEkrans);
 		sakumaEkrans.setLayout(null);
@@ -1076,7 +1130,7 @@ public class Vizualizacija extends JFrame{
 		sakumaEkrans.add(uzVietasButton);
 		
 		JLabel uzVietasLabel = new JLabel("Ēst uz vietas");
-		uzVietasLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		uzVietasLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		uzVietasLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		uzVietasLabel.setBounds(342, 467, 100, 19);
 		sakumaEkrans.add(uzVietasLabel);
@@ -1090,12 +1144,13 @@ public class Vizualizacija extends JFrame{
 		
 		JLabel uzMajamLabel = new JLabel("Pasūtīt uz mājām");
 		uzMajamLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		uzMajamLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		uzMajamLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		uzMajamLabel.setBounds(543, 467, 130, 19);
 		sakumaEkrans.add(uzMajamLabel);
 		
 		JPanel pizza = new JPanel();
-		contentPane.setLayer(pizza, 11);
+		pizza.setBackground(new Color(240, 240, 240));
+		contentPane.setLayer(pizza, 12);
 		pizza.setBounds(0, 0, 1000, 850);
 		contentPane.add(pizza);
 		pizza.setLayout(null);
@@ -1111,36 +1166,42 @@ public class Vizualizacija extends JFrame{
 		gatavaBilde.setBounds(62, 140, 300, 300);
 		pizza.add(gatavaBilde);
 		
-		JToggleButton gatavacm20 = new JToggleButton("20cm");
+		gatavacm20 = new JToggleButton("20cm");
 		gatavacm20.setSelected(true);
-		gatavacm20.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavacm20.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavacm20.setBounds(423, 170, 115, 34);
+		gatavacm20.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavacm20);
 		
-		JToggleButton gatavacm30 = new JToggleButton("30cm");
-		gatavacm30.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavacm30 = new JToggleButton("30cm");
+		gatavacm30.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavacm30.setBounds(558, 170, 115, 34);
+		gatavacm30.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavacm30);
 		
-		JToggleButton gatavacm60 = new JToggleButton("60cm");
-		gatavacm60.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavacm60 = new JToggleButton("60cm");
+		gatavacm60.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavacm60.setBounds(693, 170, 115, 34);
+		gatavacm60.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavacm60);
 		
-		JToggleButton gatavaplana = new JToggleButton("Plāna");
+		gatavaplana = new JToggleButton("Plāna");
 		gatavaplana.setSelected(true);
-		gatavaplana.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavaplana.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavaplana.setBounds(423, 265, 115, 34);
+		gatavaplana.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavaplana);
 		
-		JToggleButton gatavavideja = new JToggleButton("Vidēja");
-		gatavavideja.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavavideja = new JToggleButton("Vidēja");
+		gatavavideja.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavavideja.setBounds(558, 265, 115, 34);
+		gatavavideja.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavavideja);
 		
-		JToggleButton gatavabieza = new JToggleButton("Bieza");
-		gatavabieza.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavabieza = new JToggleButton("Bieza");
+		gatavabieza.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavabieza.setBounds(693, 265, 115, 34);
+		gatavabieza.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		pizza.add(gatavabieza);
 		
 		JLabel lblNewLabel_8_1 = new JLabel("");
@@ -1158,21 +1219,22 @@ public class Vizualizacija extends JFrame{
 		gatavaAprakstsLabel.setVerticalAlignment(SwingConstants.TOP);
 		gatavaAprakstsLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		gatavaAprakstsLabel.setForeground(new Color(79, 79, 79));
-		gatavaAprakstsLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+		gatavaAprakstsLabel.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		gatavaAprakstsLabel.setBounds(16, 18, 275, 128);
 		gatavaPanel.add(gatavaAprakstsLabel);
 		
 		JButton pirktGatavaPoga = new JButton("Pasūtīt");
 		pirktGatavaPoga.setSize(new Dimension(173, 41));
 		pirktGatavaPoga.setForeground(Color.WHITE);
-		pirktGatavaPoga.setFont(new Font("Inter", Font.PLAIN, 16));
+		pirktGatavaPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
 		pirktGatavaPoga.setBackground(new Color(205, 70, 49));
 		pirktGatavaPoga.setBounds(123, 157, 173, 41);
+		pirktGatavaPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		gatavaPanel.add(pirktGatavaPoga);
 		
 		JSpinner pirktSpinner = new JSpinner();
 		pirktSpinner.setModel(new SpinnerNumberModel(1, 1, 9, 1));
-		pirktSpinner.setFont(new Font("Inter", Font.BOLD, 14));	
+		pirktSpinner.setFont(new Font("Segoe UI",  Font.BOLD, 14));	
 		pirktSpinner.setFocusable(false);
 		pirktSpinner.setFocusTraversalPolicyProvider(true);
 		pirktSpinner.setFocusCycleRoot(true);
@@ -1199,9 +1261,9 @@ public class Vizualizacija extends JFrame{
 							gatavaApraksts = buvetAprakstu("20 cm");
 							gatavaAprakstsLabel.setText(gatavaApraksts);
 							gatavaCena -= lastGatavaCena;
-							gatavaCena+=9.99;
+							gatavaCena = gatavaBaseCena;
 							pirktGatavaPoga.setText(df.format(gatavaCena)+"€");
-							lastGatavaCena = 9.99;
+							lastGatavaCena = gatavaCena;
 							
 						}else
 							gatavacm20.setSelected(true);
@@ -1223,9 +1285,9 @@ public class Vizualizacija extends JFrame{
 							gatavaApraksts = buvetAprakstu("30 cm");
 							gatavaAprakstsLabel.setText(gatavaApraksts);
 							gatavaCena -= lastGatavaCena;
-							gatavaCena += 12.59;
-							lastGatavaCena = 12.59;
+							gatavaCena = gatavaBaseCena + 2.60;
 							pirktGatavaPoga.setText(df.format(gatavaCena)+"€");
+							lastGatavaCena = gatavaCena;
 							
 						}else
 							gatavacm30.setSelected(true);
@@ -1248,9 +1310,9 @@ public class Vizualizacija extends JFrame{
 									gatavaApraksts = buvetAprakstu("60 cm");
 									gatavaAprakstsLabel.setText(gatavaApraksts);
 									gatavaCena -= lastGatavaCena;
-									gatavaCena += 19.19;
+									gatavaCena = gatavaBaseCena + 10.18;
 									pirktGatavaPoga.setText(df.format(gatavaCena)+"€");
-									lastGatavaCena = 19.19;
+									lastGatavaCena = gatavaCena;
 									
 								}else
 									gatavacm60.setSelected(true);
@@ -1343,6 +1405,7 @@ public class Vizualizacija extends JFrame{
 						
 						pirktGatavaPoga.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent e) {
+								backPoga.setVisible(false);
 								tabbedPane.setVisible(true);
 								
 								int skaits = Integer.parseInt( pirktSpinner.getValue().toString());
@@ -1399,8 +1462,33 @@ public class Vizualizacija extends JFrame{
 								System.out.println(skaits);
 								String apraksts = "<html><body style='width: 200px'><b>"+gatavaNosaukums+" </b>"+"x"+String.valueOf(skaits)+"</b><br> "+temp+"<br><b>"+cena+"€</b>";
 								// String merce,String siers, String gala, ArrayList<String>  piedevas, double cena, ImageIcon bilde
-								
-								Pica tavaPica = new Pica(skaits,gatavaNosaukums,izmers,mikla,merce,siers, gala,piedevas,cena, new ImageIcon(Vizualizacija.class.getResource("/bildes/tavaPica.png")), apraksts);
+								ImageIcon icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/bbq.png"));
+								switch(gatavaNosaukums)
+								{
+									case "Salami Pica":
+										icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/salami.png"));
+										break;
+									case "BBQ Pica":
+										icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/bbq.png"));
+										break;
+									case "Siera Pica":
+										icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/siera.png"));
+										break;
+									case "Bekona Pica":
+										icon =  new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/bekona.png"));
+										break;
+									case "Lauku Pica":
+										icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/lauku.png"));
+										break;
+									case "Čillī Pica":
+										icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/pica_gatavas/cili.png"));
+										break;
+
+								}
+
+								ImageIcon jaunaBilde = new ImageIcon(icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH));
+								//Pica tavaPica = new Pica(skaits,"Tava pica",izmers,mikla,merce,siers, gala,piedevas,cena, new ImageIcon(icon.getImage().getScaledInstance(100,100, Image.SCALE_SMOOTH)), apraksts,0);
+								Pica tavaPica = new Pica(skaits,gatavaNosaukums,izmers,mikla,merce,siers, gala,piedevas,cena, jaunaBilde, apraksts,0);
 								model.addElement(tavaPica);
 								Run.PasutijumuSaraksts.add(tavaPica);
 								
@@ -1408,9 +1496,9 @@ public class Vizualizacija extends JFrame{
 								for(int i = 0; i< Run.PasutijumuSaraksts.size(); i++)
 									summaCena += Run.PasutijumuSaraksts.get(i).getCena();
 								
-								piegadeSummaLabel.setText(df.format(summaCena)+"€");
-								piegadePiegadeLabel.setText(df.format(summaCena/10)+"€");
-								piegadeKopaLabel.setText(df.format(summaCena + (summaCena/10))+"€");
+								summaLbl.setText(df.format(summaCena)+"€");
+								piegadeLbl.setText(df.format(summaCena/10)+"€");
+								kopaLbl.setText(df.format(summaCena + (summaCena/10))+"€");
 								
 								
 								pizza.setVisible(false);
@@ -1431,6 +1519,9 @@ public class Vizualizacija extends JFrame{
 						);
 		salamiPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 9.99;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "Salami Pica";
@@ -1452,6 +1543,9 @@ public class Vizualizacija extends JFrame{
 		
 		bbqPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 14.99;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "BBQ Pica";
@@ -1473,6 +1567,9 @@ public class Vizualizacija extends JFrame{
 		
 		sieraPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 12.99;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "Siera Pica";
@@ -1494,6 +1591,9 @@ public class Vizualizacija extends JFrame{
 		
 		laukuPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 12.99;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "Lauku Pica";
@@ -1515,6 +1615,9 @@ public class Vizualizacija extends JFrame{
 		
 		ciliPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 10.18;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "Čillī Pica";
@@ -1536,6 +1639,9 @@ public class Vizualizacija extends JFrame{
 		
 		bekonaPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backPoga.setVisible(true);
+				defaultStateGatavamPogam();
+				gatavaBaseCena = 14.99;
 				tabbedPane.setVisible(false);
 				pirktSpinner.setValue(1);
 				gatavaNosaukums = "Bekona Pica";
@@ -1561,19 +1667,6 @@ public class Vizualizacija extends JFrame{
 					public void actionPerformed(ActionEvent e) {
 						sakumaEkrans.setVisible(false);
 					}});
-		
-		uzVietasPasutitPoga.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				registracijaDalejaEkrans.setVisible(true);
-			}
-			});
-		
-		piegadePasutitPoga.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				registracijaEkrans.setVisible(true);
-				JOptionPane.showMessageDialog(null, "Jus veismigi pasutijat picu, piegadatajs bus gerbies tehiniknsdsuima uniforma!");
-			}
-			});
 		
 		
 		cm20.addActionListener(new ActionListener() {
@@ -2195,6 +2288,29 @@ public class Vizualizacija extends JFrame{
 		
 		
 		
+		piegadePasutitPoga.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(Run.PasutijumuSaraksts.size() > 0 && piegadePoga.isSelected())
+				{
+					
+					contentPane.setLayer(registracijaEkrans, 13);
+					registracijaEkrans.setVisible(true);
+					picuProgressPanel.setVisible(true);
+					Run.setProgress();
+					model.clear();	
+				
+				}else if(Run.PasutijumuSaraksts.size() > 0 && uzvietasPoga.isSelected())
+				{
+					contentPane.setLayer(registracijaDalejaEkrans, 13);
+					registracijaEkrans.setVisible(true);
+					picuProgressPanel.setVisible(true);
+					Run.setProgress();
+					model.clear();	
+				}
+
+				
+			}
+			});
 		
 		piegadePoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -2203,8 +2319,18 @@ public class Vizualizacija extends JFrame{
 					piegadePanel.setVisible(true);
 				}else
 					piegadePoga.setSelected(true);
-				uzvietasPanel.setVisible(false);
+				
 				uzvietasPoga.setSelected(false);
+				
+				adreseLauks.setEnabled(true);
+				
+				double summaCena = 0;
+				for(int i = 0; i< Run.PasutijumuSaraksts.size(); i++)
+					summaCena += Run.PasutijumuSaraksts.get(i).getCena();
+				
+				summaLbl.setText(df.format(summaCena)+"€");
+				piegadeLbl.setText("5.00€");
+				kopaLbl.setText(df.format(summaCena + 5)+"€");
 					
 				
 			}
@@ -2212,13 +2338,25 @@ public class Vizualizacija extends JFrame{
 		
 		uzvietasPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(uzvietasPoga.isSelected())
-				{
-					uzvietasPanel.setVisible(true);
-				}else
+				if(!uzvietasPoga.isSelected())
 					uzvietasPoga.setSelected(true);
+				
+				
 				piegadePoga.setSelected(false);
-				piegadePanel.setVisible(false);
+				piegadePanel.setEnabled(false);
+				
+				
+				adreseLauks.setEnabled(false);
+				
+				double summaCena = 0;
+				for(int i = 0; i< Run.PasutijumuSaraksts.size(); i++)
+					summaCena += Run.PasutijumuSaraksts.get(i).getCena();
+				
+				summaLbl.setText(df.format(summaCena)+"€");
+				piegadeLbl.setText("0.00€");
+				kopaLbl.setText(df.format(summaCena)+"€");
+				
+				
 				
 				
 //				
@@ -2321,8 +2459,9 @@ public class Vizualizacija extends JFrame{
 				System.out.println(skaits);
 				String apraksts = "<html><body style='width: 200px'><b>Tava pica </b>"+"x"+String.valueOf(skaits)+"</b><br> "+temp+"<br><b>"+cena+"€</b>";
 				// String merce,String siers, String gala, ArrayList<String>  piedevas, double cena, ImageIcon bilde
-				
-				Pica tavaPica = new Pica(skaits,"Tava pica",izmers,mikla,merce,siers, gala,piedevas,cena, new ImageIcon(Vizualizacija.class.getResource("/bildes/tavaPica.png")), apraksts);
+
+				ImageIcon icon = new ImageIcon(Vizualizacija.class.getResource("/bildes/tavaPica.png"));
+				Pica tavaPica = new Pica(skaits,"Tava pica",izmers,mikla,merce,siers, gala,piedevas,cena, icon, apraksts,0);
 				model.addElement(tavaPica);
 				Run.PasutijumuSaraksts.add(tavaPica);
 				
@@ -2331,9 +2470,9 @@ public class Vizualizacija extends JFrame{
 				for(int i = 0; i< Run.PasutijumuSaraksts.size(); i++)
 					summaCena += Run.PasutijumuSaraksts.get(i).getCena();
 				
-				piegadeSummaLabel.setText(df.format(summaCena)+"€");
-				piegadePiegadeLabel.setText(df.format(summaCena/10)+"€");
-				piegadeKopaLabel.setText(df.format(summaCena + (summaCena/10))+"€");
+				summaLbl.setText(df.format(summaCena)+"€");
+				piegadeLbl.setText(df.format(summaCena/10)+"€");
+				kopaLbl.setText(df.format(summaCena + (summaCena/10))+"€");
 					
 				
 				
@@ -2346,12 +2485,26 @@ public class Vizualizacija extends JFrame{
 		backPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tabbedPane.setVisible(true);
-				pizza.setVisible(false);
+				pizza.setVisible(false); 
 				temp = "";
 				gatavaSastavdalas.clear();
 				buvetSastavdalas.clear();
 				buvetAprakstu("20 cm");
 				aprakstsLabel.setText(buvetAprakstu("Plāna mīkla"));
+				backPoga.setVisible(false);
+				
+			}
+		});
+		
+
+		adreseLauks.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				adrese = adreseLauks.getSelectedItem().toString();
+				System.out.println(adrese);
+				adreseLauks.addItem(adrese);
+				
+				
 				
 			}
 		});
@@ -2441,9 +2594,30 @@ public class Vizualizacija extends JFrame{
 				public void mouseExited(MouseEvent e) { sipoliPoga.setText("Sīpoli"); }
 			}
 		);
+		exitPoga.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				exitPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/exit_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				exitPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/exit.png")));
+			}
+		});
+		backPoga.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				backPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/back_hover.png")));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				backPoga.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/back.png")));
+			}
+		});
+
 
 	}
-
+	
 
 
 	static String buvetAprakstu(String sastavdala) {
@@ -2480,6 +2654,7 @@ public class Vizualizacija extends JFrame{
 
 		return temp;
 	}
+	
 
 	static String buvetAprakstsDzest (String sastavdala) {
 		buvetSastavdalas.remove(sastavdala);
