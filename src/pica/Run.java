@@ -3,6 +3,7 @@ package pica;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 import javax.swing.*;
@@ -14,7 +15,10 @@ import static pica.Vizualizacija.*;
 
 public class Run {
 	public static ArrayList<Pica> PasutijumuSaraksts = new ArrayList<Pica>();
+	public static ArrayList<Pasutitajs> pasutititaji = new ArrayList<Pasutitajs>();
 	public static ArrayList<String> buvetSastavdalas = new ArrayList<String>();
+	public static HashMap<Pasutitajs,ArrayList<Pica>> vesture = new HashMap<>();
+	public static ArrayList<Pica> duplikatSaraksts = new ArrayList<Pica>();
 
 	public static void main(String[] args) {
 		sakt();
@@ -62,7 +66,10 @@ public class Run {
 	}
 
 	static void setProgress() {
+		
+		duplikatSaraksts.addAll(PasutijumuSaraksts);
 
+		if(duplikatSaraksts.size() > 0) {
 		JPanel[] sloti = {slot1, slot2, slot3};
 		JLabel[] slotApraksts = {slot1Apraksts, slot2Apraksts, slot3Apraksts};
 		JLabel[] slotProcenti = {slot1Procenti, slot2Procenti, slot3Procenti};
@@ -72,22 +79,21 @@ public class Run {
 
 		
 
-		if(PasutijumuSaraksts.size() > 3)
-			gaidaSkaitsLabel.setText("Gaida: " + (PasutijumuSaraksts.size() - 3) + " pica(s)");
+		if(duplikatSaraksts.size() > 3)
+			gaidaSkaitsLabel.setText("Gaida: " + (duplikatSaraksts.size() - 3) + " pica(s)");
 		else
 			gaidaSkaitsLabel.setText("Gaida: 0 pica(s)");
 
-		if(PasutijumuSaraksts.size() <= 3)
-		pasutijumuSkaitsLabel.setText(PasutijumuSaraksts.size()+"/3");
+		if(duplikatSaraksts.size() <= 3)
+		pasutijumuSkaitsLabel.setText(duplikatSaraksts.size()+"/3");
 
 
 
-		for (int i = 0; i < PasutijumuSaraksts.size(); i++)
+		for (int i = 0; i < duplikatSaraksts.size(); i++)
 		{
 			if(!sloti[i % 3].isVisible())
 			{
 
-			//set necessary components visible
 			sloti[i % 3].setVisible(true);
 			slotApraksts[i % 3].setVisible(true);
 			slotProcenti[i % 3].setVisible(true);
@@ -95,25 +101,26 @@ public class Run {
 			slotProgress[i % 3].setVisible(true);
 			slotBilde[i % 3].setVisible(true);
 
-			if (PasutijumuSaraksts.get(i).getGataviba() < 1) {
+			if (duplikatSaraksts.get(i).getGataviba() < 1) {
 				String piedevas = "<html><body style='width: 10px'>";
-				for (int j = 0; j < PasutijumuSaraksts.get(i).getPiedevas().size(); j++) {
-					if (j == PasutijumuSaraksts.get(i).getPiedevas().size() - 1)
-						piedevas += PasutijumuSaraksts.get(i).getPiedevas().get(j);
+				for (int j = 0; j < duplikatSaraksts.get(i).getPiedevas().size(); j++) {
+					if (j == duplikatSaraksts.get(i).getPiedevas().size() - 1)
+						piedevas += duplikatSaraksts.get(i).getPiedevas().get(j);
 					else
-						piedevas += PasutijumuSaraksts.get(i).getPiedevas().get(j) + ", ";
+						piedevas += duplikatSaraksts.get(i).getPiedevas().get(j) + ", ";
 				}
-				String apraksts = PasutijumuSaraksts.get(i).getIzmers() + ", " + PasutijumuSaraksts.get(i).getMiklasVeids() + ", "
-						+ PasutijumuSaraksts.get(i).getMerce() + ", " + PasutijumuSaraksts.get(i).getSiers() + ", " + PasutijumuSaraksts.get(i).getGala() + ", " + piedevas;
+				String apraksts = duplikatSaraksts.get(i).getIzmers() + ", " + duplikatSaraksts.get(i).getMiklasVeids() + ", "
+						+ duplikatSaraksts.get(i).getMerce() + ", " + duplikatSaraksts.get(i).getSiers() + ", " + duplikatSaraksts.get(i).getGala() + ", " + piedevas;
 
 				slotApraksts[i % 3].setText(apraksts);
-				slotProcenti[i % 3].setText(PasutijumuSaraksts.get(i).getGataviba() + " %");
-				slotBilde[i % 3].setIcon(new ImageIcon(((PasutijumuSaraksts.get(i).getBilde().getImage().getScaledInstance(172, 170, java.awt.Image.SCALE_SMOOTH)))));
-				slotNosaukums[i % 3].setText(PasutijumuSaraksts.get(i).getNosaukums());
-				slotProgress[i % 3].setValue(PasutijumuSaraksts.get(i).getGataviba());
+				slotProcenti[i % 3].setText(duplikatSaraksts.get(i).getGataviba() + " %");
+				slotBilde[i % 3].setIcon(new ImageIcon(((duplikatSaraksts.get(i).getBilde().getImage().getScaledInstance(172, 170, java.awt.Image.SCALE_SMOOTH)))));
+				slotNosaukums[i % 3].setText(duplikatSaraksts.get(i).getNosaukums());
+				slotProgress[i % 3].setValue(duplikatSaraksts.get(i).getGataviba());
 
 				int finalI = i;
 				new Thread(() -> {
+					String nosaukums = duplikatSaraksts.get(finalI).getNosaukums();
 					try {
 						for (int j = 0; j <= 100; j++) {
 							slotProgress[finalI % 3].setValue(j);
@@ -129,11 +136,11 @@ public class Run {
 						trayIcon.setImageAutoSize(true);
 						trayIcon.setToolTip("Pica gatava");
 						tray.add(trayIcon);
-						trayIcon.displayMessage("Ziņojums", PasutijumuSaraksts.get(0).getNosaukums() + " gatava!", TrayIcon.MessageType.INFO);
+
+						trayIcon.displayMessage("Ziņojums", nosaukums + " gatava!", TrayIcon.MessageType.NONE);
 						tray.remove(trayIcon);
+						duplikatSaraksts.remove(0);
 
-
-						PasutijumuSaraksts.remove(0);
 						slotApraksts[finalI % 3].setText("");
 						slotProcenti[finalI % 3].setText("");
 						slotBilde[finalI % 3].setIcon(null);
@@ -142,17 +149,80 @@ public class Run {
 						sloti[finalI % 3].setVisible(false);
 						slotProgress[finalI % 3].setVisible(false);
 						slotApraksts[finalI % 3].setVisible(false);
+						
+						
+						if(duplikatSaraksts.size() > 3)
+							gaidaSkaitsLabel.setText("Gaida: " + (duplikatSaraksts.size() - 3) + " pica(s)");
+						else
+							gaidaSkaitsLabel.setText("Gaida: 0 pica(s)");
 
+						if(duplikatSaraksts.size() <= 3)
+						pasutijumuSkaitsLabel.setText(duplikatSaraksts.size()+"/3");
 
+						setProgress();
+						
+						if(duplikatSaraksts.size() == 0)
+							picuProgressPanel.setVisible(false);
+						
+						
+
+						
+						
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 				}).start();
+				
+				
 
 			}
 		}
 		}
+		}
 
+	}
+	
+	
+	static void Registracija() {
+		String vards = vardsIevade.getText();
+		String uzvards = uzvardsIevade.getText();
+		String numurs = numursIevade.getText();
+		String adrese =  adreseLauks.getSelectedItem().toString();
+		String apmaksasVeids = choiceKarte.isSelected() ? "Ar karti" : "Skaidra";
+		Pasutitajs pasutitajs = new Pasutitajs(vards,uzvards,numurs,adrese,apmaksasVeids);
+		
+		pasutititaji.add(pasutitajs);
+		System.out.println(apmaksasVeids);
+		
+		ArrayList<Pica> picas = new ArrayList<>();
+		
+		
+		for(Pica pica : PasutijumuSaraksts)
+			picas.add(pica);
+		
+		vesture.put(pasutitajs,picas);
+		setProgress();
+		PasutijumuSaraksts.clear();
+	
+	}
+	
+	static void dalejaRegistracija() {
+		String vards = vardsDalejaIevade.getText();
+		String apmaksasVeids = choiceKarte_1.isSelected() ? "Ar karti" : "Skaidra";
+		Pasutitajs pasutitajs = new Pasutitajs(vards,"Nav","Nav","Nav",apmaksasVeids);
+		
+		pasutititaji.add(pasutitajs);
+		System.out.println(apmaksasVeids);
+		
+		ArrayList<Pica> picas = new ArrayList<>();
+		
+		
+		for(Pica pica : PasutijumuSaraksts)
+			picas.add(pica);
+		
+		vesture.put(pasutitajs,picas);
+		setProgress();
+		PasutijumuSaraksts.clear();
 	}
 	
 
@@ -167,3 +237,7 @@ public class Run {
 	}
 
 }
+
+
+
+

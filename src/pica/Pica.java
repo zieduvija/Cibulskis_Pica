@@ -14,6 +14,7 @@ public class Pica {
     
     Pica(int skaits, String nosaukums, String izmers, String miklasVeids, String merce,String siers, String gala, ArrayList<String>  piedevas, double cena, ImageIcon bilde , String apraksts, int gataviba )
     {
+    	this.skaits = skaits;
     	this.nosaukums = nosaukums;
         this.izmers = izmers;
         this.miklasVeids = miklasVeids;
@@ -55,6 +56,7 @@ public class Pica {
     	return this.bilde;
     }
     public String getApraksts() {
+    	
     	return this.apraksts;
     }
     public int getSkaits() {

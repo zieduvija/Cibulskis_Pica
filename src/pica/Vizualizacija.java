@@ -3,7 +3,8 @@ package pica;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,6 +36,7 @@ import java.text.DecimalFormat;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.Box;
@@ -42,15 +44,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JProgressBar;
 
 import static pica.Run.defaultStateGatavamPogam;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 
 public class Vizualizacija extends JFrame{
 
 
 
-
+	static boolean pievienots = false;
 	private JLayeredPane contentPane;
-	private JTextField vardsIevade,uzvardsIevade,numursIevade,vardsDalejaIevade;
 	private static JPanel sideBar;
 	private JLabel tomatiBilde;
 	private JLabel tomatuBilde;
@@ -70,7 +73,7 @@ public class Vizualizacija extends JFrame{
 	private static JSpinner spinner = new JSpinner();
 	
 	DecimalFormat df = new DecimalFormat("#.##");
-	private JTable table; public static JComboBox adreseLauks;
+	public static JComboBox<String> adreseLauks;
 	public static JLabel slot1Procenti, slot2Procenti, slot3Procenti;
 	public static JLabel slot1Nosaukums, slot2Nosaukums, slot3Nosaukums;
 	public static JProgressBar slot1Progress, slot2Progress, slot3Progress;
@@ -78,6 +81,12 @@ public class Vizualizacija extends JFrame{
 	public static JLabel slot1Bilde, slot2Bilde, slot3Bilde, gaidaSkaitsLabel, pasutijumuSkaitsLabel;
 	public static JToggleButton gatavacm20, gatavacm30, gatavacm60, gatavaplana, gatavavideja, gatavabieza;
 	public static JPanel slot1, slot2, slot3;
+	public static JTextField uzvardsIevade;
+	public static JRadioButton choiceKarte,choiceKarte_1;
+	public static JRadioButton choiceSkaidra;
+	public static JButton registerButton;
+	public static JTextField vardsIevade, numursIevade, vardsDalejaIevade;
+	public static JPanel picuProgressPanel;
 
 	
 	//Vizualizācija
@@ -121,8 +130,8 @@ public class Vizualizacija extends JFrame{
 		JPanel registracijaEkrans = new JPanel();
 		registracijaEkrans.setVisible(false);
 		registracijaEkrans.setBackground(new Color(255, 255, 255));
-		contentPane.setLayer(registracijaEkrans, 12);
-		registracijaEkrans.setBounds(0, -19, 1000, 850);
+		contentPane.setLayer(registracijaEkrans, 13);
+		registracijaEkrans.setBounds(0, 0, 1000, 870);
 		contentPane.add(registracijaEkrans);
 		registracijaEkrans.setLayout(null);
 		
@@ -156,7 +165,6 @@ public class Vizualizacija extends JFrame{
 		
 		numursIevade = new JTextField();
 		numursIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
-		numursIevade.setText("+371 ");
 		numursIevade.setColumns(10);
 		numursIevade.setBounds(318, 284, 370, 30);
 		registracijaEkrans.add(numursIevade);
@@ -171,7 +179,7 @@ public class Vizualizacija extends JFrame{
 		apmaksaLabel.setBounds(318, 325, 155, 20);
 		registracijaEkrans.add(apmaksaLabel);
 		
-		JButton registerButton = new JButton("Turpināt");
+		registerButton = new JButton("Turpināt");
 		registerButton.setForeground(Color.WHITE);
 		registerButton.setBackground(new Color(205, 70, 49));
 		registerButton.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
@@ -179,7 +187,7 @@ public class Vizualizacija extends JFrame{
 		registerButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		registracijaEkrans.add(registerButton);
 		
-		JRadioButton choiceKarte = new JRadioButton("- Karte");
+		choiceKarte = new JRadioButton("- Karte");
 		choiceKarte.setBackground(new Color(255, 255, 255));
 		choiceKarte.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
 		choiceKarte.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
@@ -189,7 +197,7 @@ public class Vizualizacija extends JFrame{
 		registracijaEkrans.add(choiceKarte);
 		choiceKarte.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
-		JRadioButton choiceSkaidra = new JRadioButton("- Skaidrā naudā");
+		choiceSkaidra = new JRadioButton("- Skaidrā naudā");
 		choiceSkaidra.setBackground(new Color(255, 255, 255));
 		choiceSkaidra.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceSkaidra.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
@@ -200,7 +208,7 @@ public class Vizualizacija extends JFrame{
 		
 		JLabel registerBilde = new JLabel("");
 		registerBilde.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/registracijaBilde.png")));
-		registerBilde.setBounds(207, 290, 585, 587);
+		registerBilde.setBounds(207, 252, 585, 587);
 		registracijaEkrans.add(registerBilde);
 		
 		JPanel registracijaDalejaEkrans = new JPanel();
@@ -226,7 +234,7 @@ public class Vizualizacija extends JFrame{
 		vardsDalejaIevade.setFont(new Font("Segoe UI",  Font.PLAIN, 14));
 		vardsDalejaIevade.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		vardsDalejaIevade.setColumns(10);
-		vardsDalejaIevade.setBounds(318, 214, 155, 30);
+		vardsDalejaIevade.setBounds(318, 214, 370, 30);
 		registracijaDalejaEkrans.add(vardsDalejaIevade);
 		
 		JLabel apmaksaLabel_1 = new JLabel("Apmaksas veids");
@@ -234,15 +242,15 @@ public class Vizualizacija extends JFrame{
 		apmaksaLabel_1.setBounds(318, 251, 155, 20);
 		registracijaDalejaEkrans.add(apmaksaLabel_1);
 		
-		JButton registerButton_1 = new JButton("Turpināt");
-		registerButton_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		registerButton_1.setForeground(Color.WHITE);
-		registerButton_1.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
-		registerButton_1.setBackground(new Color(205, 70, 49));
-		registerButton_1.setBounds(546, 357, 142, 42);
-		registracijaDalejaEkrans.add(registerButton_1);
+		JButton regPoga = new JButton("Turpināt");
+		regPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		regPoga.setForeground(Color.WHITE);
+		regPoga.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
+		regPoga.setBackground(new Color(205, 70, 49));
+		regPoga.setBounds(546, 357, 142, 42);
+		registracijaDalejaEkrans.add(regPoga);
 		
-		JRadioButton choiceKarte_1 = new JRadioButton("- Karte");
+		choiceKarte_1 = new JRadioButton("- Karte");
 		choiceKarte_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		choiceKarte_1.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox.png")));
 		choiceKarte_1.setSelectedIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/checkbox_checked.png")));
@@ -679,9 +687,9 @@ public class Vizualizacija extends JFrame{
 		pasutijumiLabel.setBounds(349, 11, 297, 147);
 		pasutijumiEkrans.add(pasutijumiLabel);
 		
-		JPanel picuProgressPanel = new JPanel();
+		picuProgressPanel = new JPanel();
 		picuProgressPanel.setVisible(false);
-		picuProgressPanel.setBounds(30, 129, 928, 587);
+		picuProgressPanel.setBounds(30, 129, 928, 481);
 		pasutijumiEkrans.add(picuProgressPanel);
 		picuProgressPanel.setLayout(null);
 		
@@ -799,16 +807,6 @@ public class Vizualizacija extends JFrame{
 		pasutijumuSkaitsLabel.setFont(new Font("Segoe UI",  Font.BOLD, 34));
 		pasutijumuSkaitsLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		JLabel pasutijumuVestureLabel = new JLabel("");
-		pasutijumuVestureLabel.setBounds(359, 477, 216, 43);
-		picuProgressPanel.add(pasutijumuVestureLabel);
-		pasutijumuVestureLabel.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/Pasūtījumu vēsture.png")));
-		
-		JButton vestureButton = new JButton("Apskatīt");
-		vestureButton.setBounds(390, 531, 155, 36);
-		picuProgressPanel.add(vestureButton);
-		vestureButton.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
-		
 		gaidaSkaitsLabel = new JLabel("1 gaida");
 		gaidaSkaitsLabel.setBounds(358, 63, 218, 43);
 		picuProgressPanel.add(gaidaSkaitsLabel);
@@ -823,6 +821,64 @@ public class Vizualizacija extends JFrame{
 		lblNewLabel_6.setBounds(314, 394, 366, 75);
 		pasutijumiEkrans.add(lblNewLabel_6);
 		
+		JButton vestureButton = new JButton("Apskatīt");
+		vestureButton.setBounds(420, 691, 155, 36);
+		pasutijumiEkrans.add(vestureButton);
+		vestureButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		vestureButton.setFont(new Font("Segoe UI",  Font.PLAIN, 16));
+		
+		JLabel pasutijumuVestureLabel = new JLabel("");
+		pasutijumuVestureLabel.setBounds(389, 637, 216, 43);
+		pasutijumiEkrans.add(pasutijumuVestureLabel);
+		pasutijumuVestureLabel.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/Pasūtījumu vēsture.png")));
+		
+
+//		vestureButton.addActionListener(new ActionListener() {
+//		    public void actionPerformed(ActionEvent e) {
+//		        String data = "";
+//		        
+//		        for (Map.Entry<Pasutitajs, ArrayList<Pica>> entry : Run.vesture.entrySet()) {
+//		            Pasutitajs cilveks = entry.getKey();
+//		            ArrayList<Pica> picas = entry.getValue();
+//		            if (cilveks != null && picas != null && !picas.isEmpty()) {
+//		                String picasStr = "";
+//		                for (Pica pica : picas) {
+//		                    picasStr += pica.getNosaukums() + ", " + pica.getIzmers() + ", " + pica.getCena() + "€ x" + pica.getSkaits() + " | ";
+//		                }
+//		                data += cilveks.getVards() + " - " + picasStr;
+//		                data += "--------------------------------------------------------------------\n";
+//		            }
+//		        }
+//
+//		        JOptionPane.showMessageDialog(picuProgressPanel, data);
+//		        data = "";
+//		    }
+//		});
+		
+		vestureButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        String data = "";
+		        
+		        for (Map.Entry<Pasutitajs, ArrayList<Pica>> entry : Run.vesture.entrySet()) {
+		            Pasutitajs cilveks = entry.getKey();
+		            ArrayList<Pica> picas = entry.getValue();
+		            if (cilveks != null && picas != null && !picas.isEmpty()) {
+		                String picasStr = "";
+		                for (Pica pica : picas) {
+		                    picasStr += pica.getNosaukums() + ", " + pica.getIzmers() + ", " + pica.getCena() + "€ x" + pica.getSkaits() + " | ";
+		                }
+		                data += cilveks.getVards() + " ("+cilveks.getEsana()+") "+" - "+ picasStr+"\n";
+		            }
+		        }
+
+		        JTextArea textArea = new JTextArea(data);
+		        textArea.setEditable(false);
+		        JScrollPane scrollPane = new JScrollPane(textArea);
+		        scrollPane.setPreferredSize(new Dimension(400, 300));
+		        JOptionPane.showMessageDialog(picuProgressPanel, scrollPane, "Pasūtījumu vēsture", JOptionPane.DEFAULT_OPTION);
+		    }
+		});
+		
 		JPanel grozsEkrans = new JPanel();
 		grozsEkrans.setBackground(new Color(240, 240, 240));
 		tabbedPane.addTab("Grozs", null, grozsEkrans, "Tavs groziņš, šeit vari norādīt kur ēdīsi un apmaksāt pirkumu!");
@@ -830,7 +886,7 @@ public class Vizualizacija extends JFrame{
 		
 		JPanel piegadePanel = new JPanel();
 		piegadePanel.setBackground(new Color(240, 240, 240));
-		piegadePanel.setBounds(531, 150, 421, 572);
+		piegadePanel.setBounds(531, 150, 421, 619);
 		grozsEkrans.add(piegadePanel);
 		piegadePanel.setLayout(null);
 		
@@ -869,12 +925,13 @@ public class Vizualizacija extends JFrame{
 		JPanel adresePanel = new JPanel();
 		adresePanel.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
 		adresePanel.setBackground(Color.WHITE);
-		adresePanel.setBounds(0, 309, 420, 49);
+		adresePanel.setBounds(0, 309, 420, 76);
 		piegadePanel.add(adresePanel);
 		adresePanel.setLayout(null);
 		
 		
 		adreseLauks = new JComboBox();
+
 		adreseLauks.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
 		adreseLauks.setToolTipText("Norādiet savu adresi šeit!");
 		adreseLauks.setEditable(true);
@@ -883,13 +940,18 @@ public class Vizualizacija extends JFrame{
 		adreseLauks.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		//adreseLauks.setHorizontalAlignment(SwingConstants.LEFT);
 		//adreseLauks.setIcon(new ImageIcon(Vizualizacija.class.getResource("/bildes/marker2.png")));
-		adreseLauks.setBounds(10, 8, 400, 32);
+		adreseLauks.setBounds(10, 31, 400, 32);
 		adresePanel.add(adreseLauks);
+		
+		JLabel lblNewLabel_7 = new JLabel("Norādiet adresi: ");
+		lblNewLabel_7.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		lblNewLabel_7.setBounds(16, 11, 167, 14);
+		adresePanel.add(lblNewLabel_7);
 		
 		JPanel summaPanel = new JPanel();
 		summaPanel.putClientProperty( FlatClientProperties.STYLE, "arc: 20" );
 		summaPanel.setBackground(Color.WHITE);
-		summaPanel.setBounds(0, 365, 420, 195);
+		summaPanel.setBounds(0, 390, 420, 195);
 		piegadePanel.add(summaPanel);
 		summaPanel.setLayout(null);
 		
@@ -1244,6 +1306,8 @@ public class Vizualizacija extends JFrame{
 	
 		
 		pizza.setVisible(false);
+		
+		
 		
 				
 				
@@ -2290,23 +2354,24 @@ public class Vizualizacija extends JFrame{
 		
 		piegadePasutitPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(Run.PasutijumuSaraksts.size() > 0 && piegadePoga.isSelected())
+				try {
+				if((Run.PasutijumuSaraksts.size() > 0 && piegadePoga.isSelected()) && adreseLauks.getSelectedItem().toString().length() > 0 )
 				{
 					
 					contentPane.setLayer(registracijaEkrans, 13);
 					registracijaEkrans.setVisible(true);
 					picuProgressPanel.setVisible(true);
-					Run.setProgress();
 					model.clear();	
 				
 				}else if(Run.PasutijumuSaraksts.size() > 0 && uzvietasPoga.isSelected())
 				{
 					contentPane.setLayer(registracijaDalejaEkrans, 13);
-					registracijaEkrans.setVisible(true);
+					registracijaDalejaEkrans.setVisible(true);
 					picuProgressPanel.setVisible(true);
-					Run.setProgress();
 					model.clear();	
 				}
+				
+				}catch(Exception f) {}
 
 				
 			}
@@ -2356,17 +2421,52 @@ public class Vizualizacija extends JFrame{
 				piegadeLbl.setText("0.00€");
 				kopaLbl.setText(df.format(summaCena)+"€");
 				
-				
-				
-				
-//				
-//				piegadeSummaLabel.setText(df.format(summaCena)+"€");
-//				piegadePiegadeLabel.setText(df.format(summaCena/10)+"€");
-//				piegadeKopaLabel.setText(df.format(summaCena + (summaCena/10))+"€");
+
 				
 				
 				
 					
+				
+			}
+		});
+		
+		
+		choiceKarte.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!choiceKarte.isSelected())
+					choiceKarte.setSelected(true);
+				
+				choiceSkaidra.setSelected(false);
+				
+			}
+		});
+		
+		choiceSkaidra.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!choiceSkaidra.isSelected())
+					choiceSkaidra.setSelected(true);
+				
+				choiceKarte.setSelected(false);
+				
+			}
+		});
+		
+		choiceKarte_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!choiceKarte_1.isSelected())
+					choiceKarte_1.setSelected(true);
+				
+				choiceSkaidra_1.setSelected(false);
+				
+			}
+		});
+		
+		choiceSkaidra_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!choiceSkaidra_1.isSelected())
+					choiceSkaidra_1.setSelected(true);
+				
+				choiceKarte_1.setSelected(false);
 				
 			}
 		});
@@ -2496,18 +2596,139 @@ public class Vizualizacija extends JFrame{
 			}
 		});
 		
-
-		adreseLauks.addActionListener(new ActionListener() {
+		
+		
+		HashSet<String> addedItems = new HashSet<>();
+		adreseLauks.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				adrese = adreseLauks.getSelectedItem().toString();
-				System.out.println(adrese);
-				adreseLauks.addItem(adrese);
-				
+		        if (!pievienots) { 
+		            adrese = adreseLauks.getSelectedItem().toString();
+		            if (!addedItems.contains(adrese)) {
+		            System.out.println(adrese);
+		            adreseLauks.addItem(adrese);
+		            addedItems.add(adrese);
+		        	}
+		            pievienots = true; 
+		        }
 				
 				
 			}
 		});
+		adreseLauks.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				pievienots = false;
+			}
+		});
+		
+		
+		
+		
+		
+		
+		registerButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String numurs = numursIevade.getText().trim(), vards = vardsIevade.getText().trim(), uzvards = uzvardsIevade.getText().trim();
+				
+				boolean derigsNr = false, derigsVards = false, derigsUzvards = false;
+				
+				if (vards.isEmpty()) 
+				    vardsIevade.setBackground(new Color(255, 150, 150));
+				else if (vards.matches(".*\\d+.*") || vards.length() <= 2) 
+				    vardsIevade.setBackground(new Color(255, 150, 150));
+				else
+				{
+					derigsVards = true;
+				    vardsIevade.setBackground(Color.WHITE); 
+				}
+				
+				if (uzvards.isEmpty()) 
+					uzvardsIevade.setBackground(new Color(255, 150, 150));
+				else if (uzvards.matches(".*\\d+.*") || uzvards.length() <= 2) 
+					uzvardsIevade.setBackground(new Color(255, 150, 150));
+				else
+				{
+					derigsUzvards = true;
+					uzvardsIevade.setBackground(Color.WHITE); 
+				}
+				
+				
+				if (numurs.isEmpty()) 
+				    numursIevade.setBackground(new Color(255, 150, 150));
+				 else
+				 {
+				    try {
+				        if (numurs.length() != 8) {
+				            numursIevade.setBackground(new Color(255, 150, 150));
+				        } else {
+				        	derigsNr = true;
+				            numursIevade.setBackground(Color.WHITE);
+				        }
+				    } catch (NumberFormatException f) {
+				        numursIevade.setBackground(new Color(255, 150, 150));
+				    }
+				}
+
+				
+				if(derigsVards && derigsUzvards && derigsNr) {
+				Run.Registracija();
+				registracijaEkrans.setVisible(false);
+				}
+
+
+			}
+		});
+		
+		numursIevade.addMouseListener(new MouseAdapter() {
+		    public void mouseEntered(MouseEvent e) {
+		        numursIevade.setBackground(Color.WHITE);
+		    }
+		});
+		vardsIevade.addMouseListener(new MouseAdapter() {
+		    public void mouseEntered(MouseEvent e) {
+		    	vardsIevade.setBackground(Color.WHITE);
+		    }
+		});
+		vardsDalejaIevade.addMouseListener(new MouseAdapter() {
+		    public void mouseEntered(MouseEvent e) {
+		    	vardsDalejaIevade.setBackground(Color.WHITE);
+		    }
+		});
+		uzvardsIevade.addMouseListener(new MouseAdapter() {
+		    public void mouseEntered(MouseEvent e) {
+		    	uzvardsIevade.setBackground(Color.WHITE);
+		    }
+		});
+		
+		regPoga.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean derigsVards = false;
+				
+				String vards = vardsDalejaIevade.getText().trim();
+				
+				if (vards.isEmpty()) 
+					vardsDalejaIevade.setBackground(new Color(255, 150, 150));
+				else if (vards.matches(".*\\d+.*") || vards.length() <= 2) 
+					vardsDalejaIevade.setBackground(new Color(255, 150, 150));
+				else
+				{
+					derigsVards = true;
+					vardsDalejaIevade.setBackground(Color.WHITE); 
+				}
+				
+				if(derigsVards)
+				{
+				Run.dalejaRegistracija();
+				registracijaDalejaEkrans.setVisible(false);
+				}
+			}
+		});
+
+
+		
+		
+		
+		
 
 
 
