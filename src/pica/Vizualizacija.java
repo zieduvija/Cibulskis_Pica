@@ -42,9 +42,10 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.JProgressBar;
 
-import static pica.Run.defaultStateGatavamPogam;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+
+import static pica.Run.*;
 
 
 public class Vizualizacija extends JFrame{
@@ -61,10 +62,8 @@ public class Vizualizacija extends JFrame{
 	lastGatavaCena = 9.99, gatavaBaseCena,
 	pedejaVertiba;
 	static String temp = "", gatavaNosaukums = "";
-	//boolean 
-	
-	
-	
+
+	static String vesturesTeksts = lasit();
 	static ArrayList<String> buvetSastavdalas = new ArrayList<>(), gatavaSastavdalas = new ArrayList<>();
 	static DefaultListModel<Pica> model = new DefaultListModel<>();
 	static String buvetApraksts = "",gatavaApraksts = "", adrese = ""; 
@@ -855,7 +854,7 @@ public class Vizualizacija extends JFrame{
 		
 		vestureButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        String data = "";
+		        String data = vesturesTeksts;
 		        
 		        for (Map.Entry<Pasutitajs, ArrayList<Pica>> entry : Run.vesture.entrySet()) {
 		            Pasutitajs cilveks = entry.getKey();
@@ -870,6 +869,7 @@ public class Vizualizacija extends JFrame{
 		        }
 
 		        JTextArea textArea = new JTextArea(data);
+				vesturesTeksts = data;
 		        textArea.setEditable(false);
 		        JScrollPane scrollPane = new JScrollPane(textArea);
 		        scrollPane.setPreferredSize(new Dimension(400, 300));
@@ -1084,7 +1084,7 @@ public class Vizualizacija extends JFrame{
 		exitPoga.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				
+				saglabat(vesturesTeksts);
 			}
 		});
 		exitPoga.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

@@ -1,6 +1,10 @@
 package pica;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -234,6 +238,32 @@ public class Run {
 		gatavaplana.setSelected(true);
 		gatavavideja.setSelected(false);
 		gatavabieza.setSelected(false);
+	}
+
+
+	static void saglabat(String text){
+		try{
+			FileWriter fw = new FileWriter("picas_dati.txt",false);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.print(text);
+			pw.close();
+		}catch (Exception e){
+			JOptionPane.showMessageDialog(null,"Fails nav atrasts!","Error",JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	static String lasit(){
+		String read = "", txt;
+		try{
+			FileReader fr = new FileReader("picas_dati.txt");
+			BufferedReader br = new BufferedReader(fr);
+			while((txt = br.readLine()) != null)
+				read += txt+"\n";
+			br.close();
+		}catch(Exception e){System.out.println("Error, "+e);}
+
+		return read;
+
 	}
 
 }
