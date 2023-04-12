@@ -4,7 +4,7 @@
 - [x] Iespējams pasūtīt picu vai uzbūvēt pašam
 - [x] Ieviest maršrutu uz piegādes
 - [ ] Salabot cepšanos ja picu skaits pārsniedz 3
-- [ ] Salabot tekstu zem piegādes maršruta
+- [x] Salabot tekstu zem piegādes maršruta
 - [ ] Optimizēt kodu
 - [ ] Noņemt liekos libraries un kodu
 
