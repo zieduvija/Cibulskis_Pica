@@ -2206,8 +2206,8 @@ public class Vizualizacija extends JFrame {
 							JSONObject jsonResponse = new JSONObject(response.toString());
 							double distanceInKm = jsonResponse.getJSONObject("route").getDouble("distance");
 
-							merkisLabel.setText(merkisLabel.getText() + " -> "
-									+ adreseLauks.getSelectedItem().toString() + "(" + df.format(distanceInKm*2)+ " km)");
+							merkisLabel.setText("<html><b>Liepājas Valsts tehnikums</b><br>Ventspils iela 51  -> "
+									+ adreseLauks.getSelectedItem().toString() + " (" + df.format(distanceInKm*2)+ " km)");
 
 						} catch (Exception f) {
 							f.printStackTrace();
