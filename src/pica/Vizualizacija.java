@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -2173,45 +2174,6 @@ public class Vizualizacija extends JFrame {
 						picuProgressPanel.setVisible(true);
 						model.clear();
 
-						String galapunkts = tulkot(adreseLauks.getSelectedItem().toString());
-						galapunkts = galapunkts.replaceAll("[^\\d,\\w\\s]", "").replaceAll("\\s+", "").trim();
-						System.out.println(galapunkts);
-
-						Image image = new ImageIcon(new URL("https://www.mapquestapi.com/staticmap/v5/" + "map?start="
-								+ "Ventspilsiela51,Liepaja" + "&end=" + galapunkts
-								+ "&size=394,210@2x&key=sMnc2yKdeYrC6jVRfMKRHD60NRnG2zWa&circle-812DD3-sm&type=light"))
-								.getImage().getScaledInstance(394, 210, Image.SCALE_SMOOTH);
-						ImageIcon icon = new ImageIcon(image);
-						img.setIcon(icon);
-
-						String apiEndpoint = "https://www.mapquestapi.com/directions/v2/optimizedroute?key="
-								+ "sMnc2yKdeYrC6jVRfMKRHD60NRnG2zWa" + "&from=" + "Ventspilsiela51,Liepaja" + "&to="
-								+ galapunkts;
-
-						try {
-							URL url = new URL(apiEndpoint);
-							HttpURLConnection con = (HttpURLConnection) url.openConnection();
-							con.setRequestMethod("GET");
-
-							BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-							String inputLine;
-							StringBuffer response = new StringBuffer();
-
-							while ((inputLine = in.readLine()) != null) {
-								response.append(inputLine);
-							}
-
-							in.close();
-
-							JSONObject jsonResponse = new JSONObject(response.toString());
-							double distanceInKm = jsonResponse.getJSONObject("route").getDouble("distance");
-
-							merkisLabel.setText("<html><b>Liepājas Valsts tehnikums</b><br>Ventspils iela 51  -> "
-									+ adreseLauks.getSelectedItem().toString() + " (" + df.format(distanceInKm*2)+ " km)");
-
-						} catch (Exception f) {
-							f.printStackTrace();
-						}
 						contentPane.setLayer(registracijaEkrans, 13);
 
 					} else if (Run.PasutijumuSaraksts.size() > 0 && uzvietasPoga.isSelected()) {
@@ -2440,6 +2402,54 @@ public class Vizualizacija extends JFrame {
 						System.out.println(adrese);
 						adreseLauks.addItem(adrese);
 						addedItems.add(adrese);
+
+
+						new Thread(() -> {
+						String galapunkts = tulkot(adreseLauks.getSelectedItem().toString());
+						galapunkts = galapunkts.replaceAll("[^\\d,\\w\\s]", "").replaceAll("\\s+", "").trim();
+						System.out.println(galapunkts);
+
+						Image image = null;
+						try {
+							image = new ImageIcon(new URL("https://www.mapquestapi.com/staticmap/v5/" + "map?start="
+									+ "Ventspilsiela51,Liepaja" + "&end=" + galapunkts
+									+ "&size=394,210@2x&key=sMnc2yKdeYrC6jVRfMKRHD60NRnG2zWa&circle-812DD3-sm&type=light"))
+									.getImage().getScaledInstance(394, 210, Image.SCALE_SMOOTH);
+						} catch (MalformedURLException ex) {
+							throw new RuntimeException(ex);
+						}
+						ImageIcon icon = new ImageIcon(image);
+						img.setIcon(icon);
+
+						String apiEndpoint = "https://www.mapquestapi.com/directions/v2/optimizedroute?key="
+								+ "sMnc2yKdeYrC6jVRfMKRHD60NRnG2zWa" + "&from=" + "Ventspilsiela51,Liepaja" + "&to="
+								+ galapunkts;
+
+						try {
+							URL url = new URL(apiEndpoint);
+							HttpURLConnection con = (HttpURLConnection) url.openConnection();
+							con.setRequestMethod("GET");
+
+							BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+							String inputLine;
+							StringBuffer response = new StringBuffer();
+
+							while ((inputLine = in.readLine()) != null) {
+								response.append(inputLine);
+							}
+
+							in.close();
+
+							JSONObject jsonResponse = new JSONObject(response.toString());
+							double distanceInKm = jsonResponse.getJSONObject("route").getDouble("distance");
+
+							merkisLabel.setText("<html><b>Liepājas Valsts tehnikums</b><br>Ventspils iela 51  -> "
+									+ adreseLauks.getSelectedItem().toString() + " (" + df.format(distanceInKm*2)+ " km)");
+
+						} catch (Exception f) {
+							f.printStackTrace();
+						}
+						}).start();
 					}
 					pievienots = true;
 				}
